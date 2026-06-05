@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multitarificador ACUDAM 2026 - Control de Ventas en Red</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Estilos de impresión profesionales para presupuestos */
+        @media print {
+            body { background: white; color: black; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-12">
+
+    <!-- Navbar Principal (no-print) -->
+    <header class="bg-slate-900 text-white shadow-md no-print sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+            <div class="flex items-center justify-between w-full lg:w-auto gap-3">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="goToHome()">
+                    <div class="p-2 bg-emerald-600 rounded-lg">
+                        <i data-lucide="layout-grid" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black tracking-tight flex items-center gap-2">
+                            ACUDAM <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-mono">PVP 2026</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Tarificadores Individuales por Categoría</p>
+                    </div>
+                </div>
+                
+                <!-- Indicador de Sincronización Cloud -->
+                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                    <span id="cloud-status-indicator" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span id="cloud-status-text" class="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider">Iniciando Cloud...</span>
+                </div>
+            </div>
+            
+            <!-- Barra de navegación por categorías -->
+            <nav class="flex flex-wrap justify-center items-center gap-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700/60 text-xs font-semibold">
+                <button onclick="goToHome()" id="nav-home" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="home" class="w-3.5 h-3.5"></i> Inicio
+                </button>
+                <button onclick="switchCategory('mosquiteras')" id="nav-mosquiteras" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="calculator" class="w-3.5 h-3.5"></i> Mosquiteras
+                </button>
+                <button onclick="switchCategory('cortinas')" id="nav-cortinas" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="door-open" class="w-3.5 h-3.5"></i> Cortinas
+                </button>
+                <button onclick="switchCategory('persianas')" id="nav-persianas" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="chevrons-down" class="w-3.5 h-3.5"></i> Persianas
+                </button>
+                <button onclick="switchCategory('marcos')" id="nav-marcos" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="frame" class="w-3.5 h-3.5"></i> Marcos y Consumibles
+                </button>
+                <button onclick="switchCategory('alfombras')" id="nav-alfombras" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="layers" class="w-3.5 h-3.5"></i> Alfombras
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Banner de sesión colaborativa de Firebase (no-print) -->
+    <section class="bg-indigo-900 text-indigo-100 py-2.5 px-4 text-center text-xs font-semibold border-b border-indigo-950 flex flex-wrap justify-center items-center gap-2 no-print shadow-inner">
+        <div class="flex flex-wrap items-center justify-center gap-4 w-full max-w-7xl mx-auto">
+            <div class="flex items-center gap-2">
+                <i data-lucide="cloud-lightning" class="w-4 h-4 text-emerald-400"></i>
+                <span>Trabajando en el Presupuesto Activo:</span>
+                <input type="text" id="input-budget-code" onchange="window.changeBudgetCode(this.value)" class="bg-indigo-950 text-emerald-400 font-mono px-3 py-1 rounded text-xs border border-indigo-700 focus:outline-none focus:border-emerald-400 font-bold w-36 text-center" value="PRE-GENERAL">
+            </div>
+            <span class="text-indigo-300">|</span>
+            <div class="text-slate-300 flex items-center gap-1">
+                <span>Tu ID de Terminal:</span>
+                <span id="session-badge" class="bg-indigo-950 text-indigo-300 font-mono px-2 py-0.5 rounded text-[11px] font-bold">Cargando...</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- PANTALLA 1: DASHBOARD / PANTALLA PRINCIPAL (no-print) -->
+    <section id="panel-home" class="max-w-7xl mx-auto px-4 py-12 no-print animate-fade-in space-y-12">
+        <div class="text-center max-w-2xl mx-auto">
+            <h2 class="text-4xl font-black text-slate-900 tracking-tight">Portal de Ventas & Red Compartida 2026</h2>
+            <p class="text-slate-500 mt-2 text-sm">Selecciona una categoría de producto. Los presupuestos se guardan de forma integrada y en red cooperativa para que puedas verlos desde cualquier tablet u ordenador al instante.</p>
+        </div>
+
+        <!-- SECCIÓN DE CENTRAL DE PRESUPUESTOS EN LA NUBE (NUEVA) -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4 mb-4">
+                <div>
+                    <h3 class="font-extrabold text-slate-900 text-lg flex items-center gap-2">
+                        <i data-lucide="cloud-cog" class="text-indigo-600 w-5 h-5"></i>
+                        Presupuestos Activos en la Nube ACUDAM
+                    </h3>
+                    <p class="text-xs text-slate-500">Listado de fichas de ventas sincronizadas en tiempo real en la red local de la empresa</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.refreshAllBudgetsList()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Actualizar Red
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla de Presupuestos Sincronizados -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-50 font-bold text-slate-600">
+                            <th class="p-3">Código de Presupuesto</th>
+                            <th class="p-3 text-center">Artículos Añadidos</th>
+                            <th class="p-3 text-right">Total Neto Estimado</th>
+                            <th class="p-3 text-right">Total con IVA (21%)</th>
+                            <th class="p-3 text-center">Acciones y Carga</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cloud-budgets-tbody" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-slate-400 italic">
+                                <div class="flex flex-col items-center gap-2">
+                                    <i data-lucide="loader" class="w-6 h-6 text-indigo-500 animate-spin"></i>
+                                    <span>Escaneando red de presupuestos en la nube...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <!-- Tarjeta: Mosquiteras -->
+            <div onclick="switchCategory('mosquiteras')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="calculator" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg text-slate-900">Mosquiteras</h3>
+                        <span id="badge-count-mosquiteras" class="hidden text-[10px] bg-slate-900 text-white font-mono px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1.5">Tarifa PVP Marzo - 2026 de ACUDAM. Incluye modelos Enrollable, Lateral, Corredera, Fija y Puerta Practicable.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600">
+                    <span>Acceder al tarificador</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Cortinas de puerta -->
+            <div onclick="switchCategory('cortinas')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-5 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="door-open" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg text-slate-900">Cortinas de puerta</h3>
+                        <span id="badge-count-cortinas" class="hidden text-[10px] bg-slate-900 text-white font-mono px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1.5">Confección a medida por M². Canutillo, Cadenas de Aluminio, Cintas de Plástico y series decorativas de ACUDAM.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-indigo-600">
+                    <span>Acceder al tarificador</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Persianas -->
+            <div onclick="switchCategory('persianas')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-amber-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-5 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="chevrons-down" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg text-slate-900">Persianas Alicantinas</h3>
+                        <span id="badge-count-persianas" class="hidden text-[10px] bg-slate-900 text-white font-mono px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1.5">Confección a medida por M² de persianas alicantinas en plástico y madera natural, barnizada o pintada.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-600">
+                    <span>Acceder al tarificador</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Marcos y Consumibles -->
+            <div onclick="switchCategory('marcos')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-rose-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-5 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="frame" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg text-slate-900">Marcos y Consumibles</h3>
+                        <span id="badge-count-marcos" class="hidden text-[10px] bg-slate-900 text-white font-mono px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1.5">Tarifa matricial de molduras 1 a 14, cristales, espejos, canto pulido lineal, traseras DM, grapas, Arraglass y Arrasol.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-rose-600">
+                    <span id="label-marcos-status">Acceder al tarificador</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Alfombras -->
+            <div onclick="switchCategory('alfombras')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-cyan-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center mb-5 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg text-slate-900">Alfombras</h3>
+                        <span id="badge-count-alfombras" class="hidden text-[10px] bg-slate-900 text-white font-mono px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1.5">Precios por metro cuadrado, alfombrados a medida y felpudos metálicos o textiles.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-cyan-600">
+                    <span id="label-alfombras-status">Esperando tus tarifas...</span>
+                    <i data-lucide="clock" class="w-4 h-4"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PANTALLA 2: ENTORNO DEL TARIFICADOR ACTIVO (no-print) -->
+    <section id="panel-tarificador" class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 no-print hidden">
+        
+        <!-- COLUMNA IZQUIERDA: CONTROLES DEL BUSCADOR (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Volver al menú de inicio -->
+            <button onclick="goToHome()" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-4 py-2.5 rounded-xl shadow-sm self-start transition cursor-pointer">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Menú Principal
+            </button>
+
+            <!-- Tarjeta del buscador dinámico -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-2 mb-4">
+                    <div id="category-badge-icon" class="p-1.5 rounded-lg text-white bg-slate-800">
+                        <!-- Icono variable -->
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Tarificando</span>
+                        <h2 id="category-active-title" class="text-lg font-black text-slate-900 leading-tight">-</h2>
+                    </div>
+                </div>
+
+                <!-- CONTENEDOR DE CAMPOS -->
+                <div id="calculator-fields" class="space-y-4">
+                    <!-- Tipo de modelo -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Modelo / Tipo</label>
+                        <select id="select-tipo" onchange="onProductChange()" class="w-full rounded-xl border border-slate-300 px-3.5 py-3 bg-white shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-slate-800 font-medium cursor-pointer">
+                            <!-- Opciones cargadas por JS -->
+                        </select>
+                    </div>
+
+                    <!-- Tipo de Cristal (Solo visible para Marcos) -->
+                    <div id="cristal-selection-wrapper" class="hidden">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">¿Lleva Cristal?</label>
+                        <select id="select-cristal" onchange="onCristalChange()" class="w-full rounded-xl border border-rose-300 px-3.5 py-3 bg-rose-50/50 shadow-sm focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-slate-800 font-semibold cursor-pointer">
+                            <option value="no" selected>No (Solo Marco)</option>
+                            <option value="c_brillo">C.Brillo (Cristal Brillo)</option>
+                            <option value="c_mate">C.Mate (Cristal Mate)</option>
+                            <option value="pp_vs">PP VS</option>
+                        </select>
+                    </div>
+
+                    <!-- SECCIÓN DE CONSUMIBLES (FOTO DE LA HOJA) - Solo visible para Marcos -->
+                    <div id="consumibles-wrapper" class="hidden border-t border-slate-100 pt-4 space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-rose-600 flex items-center gap-1.5 mb-2">
+                            <i data-lucide="package" class="w-4 h-4"></i> Consumibles Adicionales
+                        </h3>
+
+                        <!-- Espejos al corte -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Espejo al corte (M²)</label>
+                            <select id="select-espejo" onchange="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-2 bg-white text-xs font-medium cursor-pointer">
+                                <option value="ninguno" selected>Ninguno (Sin espejo)</option>
+                                <option value="espejo_3_1">3 mm al Corte (62,36 €/M²)</option>
+                                <option value="espejo_3_2">3 mm al Corte Bis (69,98 €/M²)</option>
+                                <option value="espejo_4_1">4 mm al Corte (70,57 €/M²)</option>
+                                <option value="espejo_4_2">4 mm al Corte Bis (85,27 €/M²)</option>
+                            </select>
+                        </div>
+
+                        <!-- Canto Pulido -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1 flex justify-between items-center">
+                                <span>Canto Pulido (Metros Lineales)</span>
+                                <span class="text-[10px] text-slate-400 font-normal">Sujeto a redondeo x10 cm</span>
+                            </label>
+                            <select id="select-canto-pulido" onchange="onConsumibleChange()" disabled class="w-full rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 text-xs font-medium cursor-pointer disabled:opacity-50 disabled:bg-slate-100 disabled:text-slate-400">
+                                <option value="no" selected>No aplicar (0,00 €)</option>
+                                <option value="si">Canto Pulido (+8,13 €/m.l.)</option>
+                            </select>
+                        </div>
+
+                        <!-- Traseras DM -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Traseras DM (M²)</label>
+                            <select id="select-trasera-dm" onchange="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-2 bg-white text-xs font-medium cursor-pointer">
+                                <option value="ninguno" selected>Ninguna (Sin trasera)</option>
+                                <option value="dm_2_5">Trasera DM 2.5 mm grueso (10,05 €/M²)</option>
+                                <option value="dm_4">Trasera DM 4.0 mm grueso (19,66 €/M²)</option>
+                            </select>
+                        </div>
+
+                        <!-- Grapas Enmarcación -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Grapas de Enmarcación</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <span class="block text-[10px] text-slate-400 mb-0.5">Grandes (0,78 €/u.)</span>
+                                    <input type="number" id="input-grapas-grandes" min="0" value="0" oninput="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs text-center font-bold">
+                                </div>
+                                <div>
+                                    <span class="block text-[10px] text-slate-400 mb-0.5">Pequeñas (0,45 €/u.)</span>
+                                    <input type="number" id="input-grapas-pequenas" min="0" value="0" oninput="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs text-center font-bold">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Plásticos protectores: Arraglass y Arrasol -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Plásticos Protectores Especiales (M²)</label>
+                            <select id="select-plasticos" onchange="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-2 bg-white text-xs font-medium cursor-pointer">
+                                <option value="ninguno" selected>Ninguno</option>
+                                <option value="arraglass">PS ARRAGLASS 1.5 MM (Mate/Brillo) (49,15 €/M²)</option>
+                                <option value="arrasol">ARRASOL 2 MM (Brillo/Brillo) (64,78 €/M²)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Acabados -->
+                    <div id="color-selection-wrapper">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" id="label-color-title">Color / Acabado</label>
+                        <div class="grid grid-cols-3 gap-2" id="color-swatches">
+                            <!-- Swatches interactivos -->
+                        </div>
+                    </div>
+
+                    <!-- Dimensiones -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Medidas Reales del Cliente</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <span class="block text-xs text-slate-400 mb-1">Ancho real (cm)</span>
+                                <div class="relative">
+                                    <input type="number" id="input-ancho" placeholder="Ej. 18" step="0.1" oninput="calculatePrice()" class="w-full rounded-xl border border-slate-300 pl-4 pr-10 py-3 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-semibold text-lg">
+                                    <span class="absolute right-3.5 top-3.5 text-sm font-bold text-slate-400">cm</span>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-400 mb-1">Alto real (cm)</span>
+                                <div class="relative">
+                                    <input type="number" id="input-alto" placeholder="Ej. 24" step="0.1" oninput="calculatePrice()" class="w-full rounded-xl border border-slate-300 pl-4 pr-10 py-3 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-semibold text-lg">
+                                    <span class="absolute right-3.5 top-3.5 text-sm font-bold text-slate-400">cm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISTA PREVIA PARA CATEGORÍAS SIN TARIFAS CARGADAS AÚN -->
+                <div id="calculator-placeholder" class="hidden py-8 text-center space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+                        <i data-lucide="image" class="w-8 h-8"></i>
+                    </div>
+                    <div class="max-w-xs mx-auto">
+                        <h4 class="font-bold text-slate-800 text-sm">Tarifas pendientes de configurar</h4>
+                        <p class="text-xs text-slate-400 mt-1">Envíame las fotos o documentos de las tarifas de esta sección y las integraré exactamente igual que las demás.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Resultado de Precio -->
+            <div id="price-result-card" class="bg-slate-900 text-white rounded-2xl p-6 shadow-md relative overflow-hidden border border-slate-800">
+                <div class="absolute -right-8 -bottom-8 opacity-5 text-emerald-400 pointer-events-none">
+                    <i data-lucide="euro" class="w-48 h-48"></i>
+                </div>
+
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Precio PVP Sugerido</h3>
+                        <p class="text-slate-400 text-xs mt-0.5">I.V.A. Incluido</p>
+                    </div>
+                    <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full font-semibold" id="label-color-selected">-</span>
+                </div>
+
+                <div class="flex items-baseline gap-1 my-4 relative z-10">
+                    <span id="display-price" class="text-5xl font-black tracking-tight text-white font-mono">0,00</span>
+                    <span class="text-2xl font-bold text-emerald-400">€</span>
+                </div>
+
+                <!-- Desglose de Precios (Muy util para cuando lleva Consumibles) -->
+                <div id="price-breakdown-wrapper" class="hidden border-t border-slate-800 py-3 space-y-1.5 text-[11px] text-slate-400 relative z-10">
+                    <div class="font-bold text-slate-300 text-xs uppercase tracking-wider pb-1">Desglose de cálculo:</div>
+                    <div class="flex justify-between" id="breakdown-marco">
+                        <span>Marco base:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-cristal">
+                        <span>Cristal seleccionado:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-espejo">
+                        <span>Espejo al corte:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-canto">
+                        <span>Canto Pulido:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-trasera">
+                        <span>Trasera DM:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-grapas">
+                        <span>Grapas de enmarcación:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-plasticos">
+                        <span>Plásticos protectores:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-800 pt-4 space-y-2 text-xs text-slate-300 relative z-10">
+                    <div class="flex justify-between" id="matched-size-row">
+                        <span>Medida estándar sugerida:</span>
+                        <span id="display-matched-size" class="font-bold text-white">-</span>
+                    </div>
+                    <div class="flex justify-between" id="m2-calculated-row">
+                        <span>Metros Cuadrados:</span>
+                        <span id="display-m2-calc" class="font-bold text-emerald-400">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Rango / Límites:</span>
+                        <span id="display-limit" class="font-medium">-</span>
+                    </div>
+                </div>
+
+                <!-- Añadir al Presupuesto -->
+                <div class="mt-5 pt-4 border-t border-slate-800 relative z-10">
+                    <div class="flex gap-2">
+                        <input type="text" id="input-tag" placeholder="Ubicación (ej. Cuadro Pasillo)" class="flex-1 rounded-xl bg-slate-800 border border-slate-700 px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                        <button type="button" onclick="addToQuote()" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer relative z-20">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Añadir
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerta/Advertencia de medidas -->
+            <div id="calculator-warning" class="bg-amber-50 border border-amber-200 text-amber-950 p-4 rounded-xl text-xs hidden flex gap-3 items-start">
+                <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 text-amber-600"></i>
+                <div>
+                    <span class="font-bold block" id="warning-title">Medida fuera de rango estándar</span>
+                    <span id="warning-text"></span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA: TABLA MATRICIAL Y PANEL DE CONTROL DEL PRESUPUESTO (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+            
+            <!-- Visor de Matriz Activa / Lista M2 -->
+            <div id="panel-matrix-container" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="p-5 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <h3 class="font-extrabold text-slate-900 text-md flex items-center gap-1.5">
+                            <i data-lucide="grid" class="text-emerald-600 w-5 h-5" id="panel-matrix-icon"></i>
+                            <span id="panel-matrix-title-text">Matriz de Tarifas Activa</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5" id="matrix-subtitle">Visualización de la cuadrícula real del catálogo</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full uppercase tracking-wider" id="panel-matrix-dimension-label">
+                        Ancho x Alto (cm)
+                    </span>
+                </div>
+
+                <!-- Tabla Responsive Matricial -->
+                <div class="overflow-auto max-h-[420px] bg-white text-[11px]" id="table-standard-wrapper">
+                    <table class="w-full text-left border-collapse" id="matrix-table">
+                        <!-- Renderizado dinámico -->
+                    </table>
+                </div>
+
+                <!-- Contenedor Alternativo para M2 (Cortinas y Persianas) con Previsualizador de Área -->
+                <div class="p-6 hidden grid grid-cols-1 md:grid-cols-2 gap-6 bg-white" id="m2-alternative-wrapper">
+                    <!-- Tabla de tarifas por m2 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                                    <th class="p-3">Modelo / Serie</th>
+                                    <th class="p-3 text-right">Precio Neto/M²</th>
+                                </tr>
+                            </thead>
+                            <tbody id="m2-rates-tbody">
+                                <!-- Cargado dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Representación Gráfica Escala de Dimensiones -->
+                    <div class="bg-slate-50 rounded-xl border border-slate-200 p-4 flex flex-col justify-between items-center min-h-[220px]">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Proporción a Escala</span>
+                        
+                        <!-- Caja de dibujo representativo -->
+                        <div class="w-full flex-1 flex items-center justify-center p-2">
+                            <div id="visual-scaled-box" class="bg-indigo-100 border-2 border-indigo-400 rounded-lg flex items-center justify-center text-indigo-900 font-bold text-xs shadow-inner transition-all duration-300 relative" style="width: 140px; height: 160px;">
+                                <span id="visual-scaled-txt">0.00 m²</span>
+                                <span class="absolute -left-1 transform -translate-x-full text-[9px] text-slate-400 font-mono" id="visual-scaled-h">0cm</span>
+                                <span class="absolute -bottom-1 transform translate-y-full text-[9px] text-slate-400 font-mono" id="visual-scaled-w">0cm</span>
+                            </div>
+                        </div>
+
+                        <div class="text-[10px] text-slate-500 italic text-center mt-2">
+                            * Mínimo de facturación estándar aplicado: <strong>1.00 M²</strong> por pieza.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bloque de Presupuesto / Carrito Acumulado (Por Categoría) -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-1.5">
+                        <i data-lucide="shopping-bag" class="text-emerald-600 w-5 h-5"></i>
+                        <span id="budget-category-title">Presupuesto Acumulado</span>
+                    </h3>
+                    <button onclick="clearQuote()" class="text-slate-400 hover:text-red-500 transition text-xs flex items-center gap-1 cursor-pointer">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        Limpiar sección
+                    </button>
+                </div>
+
+                <!-- Lista de productos añadidos de esta categoría -->
+                <div id="quote-list" class="space-y-2 max-h-[220px] overflow-y-auto mb-4 pr-1">
+                    <p class="text-xs text-slate-400 italic text-center py-6">No hay elementos añadidos en esta categoría.</p>
+                </div>
+
+                <!-- Total acumulado -->
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="text-center sm:text-left">
+                        <span class="text-xs text-slate-500 block uppercase font-bold tracking-wider" id="budget-sum-label">Total de esta sección</span>
+                        <div class="flex items-baseline justify-center sm:justify-start gap-1">
+                            <span id="display-total-quote" class="text-2xl font-black text-slate-950">0,00</span>
+                            <span class="text-lg font-bold text-slate-600">€</span>
+                        </div>
+                    </div>
+                    <button onclick="printQuote()" class="w-full sm:w-auto px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        Imprimir / Guardar PDF
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- VISTA EXCLUSIVA PARA IMPRESIÓN (Invisible fuera de la impresión) -->
+    <div class="hidden print-only p-8 bg-white text-black text-sm">
+        <div class="flex justify-between items-start border-b-2 border-slate-300 pb-6 mb-8">
+            <div>
+                <h1 class="text-2xl font-black tracking-tight uppercase" id="print-header-title">PRESUPUESTO</h1>
+                <p class="text-xs text-slate-500 mt-1">Generado en base a Tarifa PVP ACUDAM 2026</p>
+            </div>
+            <div class="text-right">
+                <p class="font-bold">Fecha: <span id="print-date">-</span></p>
+                <p class="text-xs text-slate-500">Validez del presupuesto: 30 días</p>
+            </div>
+        </div>
+
+        <!-- Tabla de impresión -->
+        <table class="w-full text-left border-collapse mb-8 text-xs">
+            <thead>
+                <tr class="border-b border-slate-300 bg-slate-100">
+                    <th class="p-2 font-bold">Descripción / Ubicación</th>
+                    <th class="p-2 font-bold">Categoría</th>
+                    <th class="p-2 font-bold">Modelo</th>
+                    <th class="p-2 font-bold">Selección / Extras de Consumibles</th>
+                    <th class="p-2 font-bold text-center">Medidas Reales</th>
+                    <th class="p-2 font-bold text-center">Medida Tarificada</th>
+                    <th class="p-2 font-bold text-right">Precio unitario</th>
+                </tr>
+            </thead>
+            <tbody id="print-table-rows">
+                <!-- Dinámico -->
+            </tbody>
+        </table>
+
+        <!-- Totales Impresión -->
+        <div class="flex justify-end">
+            <div class="w-64 space-y-2 border-t border-slate-300 pt-4 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Suma Base Imponible:</span>
+                    <span id="print-subtotal" class="font-bold">-</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">I.V.A. (21%):</span>
+                    <span id="print-tax" class="font-bold">-</span>
+                </div>
+                <div class="flex justify-between border-t-2 border-black pt-2 text-sm font-black">
+                    <span>Total con IVA:</span>
+                    <span id="print-total" class="text-emerald-700">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-20 border-t border-slate-200 pt-6 text-[10px] text-slate-400 text-center">
+            Este presupuesto es meramente informativo y está basado en tarifas estándares de venta recomendadas de ACUDAM.
+        </div>
+    </div>
+
+    <!-- Integración Oficial de Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDocs, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Credenciales oficiales de tu proyecto
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvOinYSF9a46hV6_zOUaI6WhlTZne2hwk",
+            authDomain: "tarifa-6d0d6.firebaseapp.com",
+            projectId: "tarifa-6d0d6",
+            storageBucket: "tarifa-6d0d6.firebasestorage.app",
+            messagingSenderId: "613616626622",
+            appId: "1:613616626622:web:fa859c9276ee5a2fc867ef",
+            measurementId: "G-W63RWS1DMF"
+        };
+
+        // Inicialización de servicios
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tarifa-6d0d6';
+
+        let currentUser = null;
+        let unsubscribeCurrentBudget = null;
+        let unsubscribeAllBudgetsList = null;
+
+        // Código de presupuesto colaborativo actual
+        window.currentBudgetCode = "PRE-GENERAL";
+
+        // Inicializar Autenticación (Directiva 3)
+        async function startAuth() {
+            try {
+                updateCloudIndicator("Autenticando...", "bg-amber-500 animate-pulse");
+                await signInAnonymously(auth);
+            } catch (err) {
+                console.error("Auth Exception:", err);
+                updateCloudIndicator("Error Conexión", "bg-red-500");
+                showToast("Fallo al conectar el terminal en la nube.", false);
+            }
+        }
+
+        // Evento de cambio de Auth
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('session-badge').textContent = user.uid.substring(0, 8) + "...";
+                updateCloudIndicator("Conectado", "bg-emerald-500");
+                
+                // Cargar presupuesto por defecto al conectar
+                loadActiveBudgetSync(window.currentBudgetCode);
+                
+                // Cargar listado general de presupuestos para el visualizador
+                refreshAllBudgetsList();
+            } else {
+                currentUser = null;
+                document.getElementById('session-badge').textContent = "Desconectado";
+                updateCloudIndicator("Sin Red", "bg-red-500");
+            }
+        });
+
+        // 1. Sincronización en tiempo real del presupuesto activo (Ruta Pública Sincronizada)
+        function loadActiveBudgetSync(code) {
+            if (unsubscribeCurrentBudget) unsubscribeCurrentBudget();
+            if (!currentUser) return;
+
+            window.currentBudgetCode = code.toUpperCase().trim().replace(/[^A-Z0-9_-]/gi, '');
+            document.getElementById('input-budget-code').value = window.currentBudgetCode;
+
+            // Directiva 1: Guardamos en la sección pública colaborativa para que otros terminales lo lean
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'presupuestos', window.currentBudgetCode);
+
+            updateCloudIndicator("Sincronizando...", "bg-blue-500 animate-pulse");
+
+            unsubscribeCurrentBudget = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data && data.budgets) {
+                        window.budgets = data.budgets;
+                    } else {
+                        resetLocalBudgets();
+                    }
+                } else {
+                    // Si el documento no existe en la nube, inicializarlo vacío
+                    resetLocalBudgets();
+                    uploadBudgetsToCloud();
+                }
+                window.updateBadgeCounts();
+                window.renderBudget();
+                updateCloudIndicator("Sincronizado", "bg-emerald-500");
+            }, (error) => {
+                console.error("Firestore Listen Error:", error);
+                updateCloudIndicator("Error Lectura", "bg-red-500");
+            });
+        }
+
+        // 2. Guardar cambios en Firestore
+        async function uploadBudgetsToCloud() {
+            if (!currentUser) return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'presupuestos', window.currentBudgetCode);
+            try {
+                updateCloudIndicator("Guardando...", "bg-blue-500 animate-pulse");
+                await setDoc(docRef, { 
+                    budgets: window.budgets,
+                    lastUpdated: Date.now(),
+                    terminalId: currentUser.uid
+                }, { merge: true });
+                updateCloudIndicator("Sincronizado", "bg-emerald-500");
+            } catch (error) {
+                console.error("Cloud Write Exception:", error);
+                updateCloudIndicator("Error Guardado", "bg-rose-500");
+                showToast("Fallo al escribir en la base de datos.", false);
+            }
+        }
+
+        // 3. Escuchar todos los presupuestos activos en red (NUEVO VISUALIZADOR MULTI-TERMINAL)
+        function refreshAllBudgetsList() {
+            if (!currentUser) return;
+
+            // Directiva 1 & 2: Consultar la colección pública sin filtros complejos
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'presupuestos');
+
+            if (unsubscribeAllBudgetsList) unsubscribeAllBudgetsList();
+
+            unsubscribeAllBudgetsList = onSnapshot(colRef, (querySnapshot) => {
+                const tbody = document.getElementById('cloud-budgets-tbody');
+                tbody.innerHTML = "";
+
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-slate-400 italic">
+                                No hay presupuestos compartidos guardados en la nube. ¡Crea el primero añadiendo artículos!
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // Generar lista de documentos y ordenarlos localmente en JS (Directiva 2)
+                const docsList = [];
+                querySnapshot.forEach((doc) => {
+                    docsList.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Ordenar por última actualización de forma descendente
+                docsList.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
+
+                docsList.forEach((bDoc) => {
+                    // Contar número total de artículos en todas las categorías
+                    let totalItems = 0;
+                    let totalNeto = 0;
+                    
+                    if (bDoc.budgets) {
+                        Object.keys(bDoc.budgets).forEach(cat => {
+                            const list = bDoc.budgets[cat] || [];
+                            totalItems += list.length;
+                            list.forEach(item => {
+                                totalNeto += item.price;
+                            });
+                        });
+                    }
+
+                    const totalConIva = totalNeto * 1.21;
+                    const isActive = bDoc.id === window.currentBudgetCode;
+
+                    const tr = document.createElement('tr');
+                    tr.className = `border-b border-slate-100 hover:bg-slate-50 transition ${isActive ? 'bg-indigo-50/40' : ''}`;
+                    tr.innerHTML = `
+                        <td class="p-3 font-mono font-bold text-slate-950 flex items-center gap-2">
+                            ${isActive ? '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>' : '<span class="w-2 h-2 rounded-full bg-slate-300"></span>'}
+                            <span class="text-sm">${bDoc.id}</span>
+                            ${isActive ? '<span class="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold uppercase font-sans">Activo</span>' : ''}
+                        </td>
+                        <td class="p-3 text-center font-bold text-slate-700">${totalItems} u.</td>
+                        <td class="p-3 text-right font-mono font-semibold text-slate-600">${totalNeto.toFixed(2)} €</td>
+                        <td class="p-3 text-right font-mono font-extrabold text-indigo-900">${totalConIva.toFixed(2)} €</td>
+                        <td class="p-3 text-center flex justify-center gap-2.5">
+                            <button onclick="window.loadBudgetFromCloudList('${bDoc.id}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold rounded-lg transition flex items-center gap-1 cursor-pointer text-[11px]">
+                                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> Cargar
+                            </button>
+                            <button onclick="window.deleteBudgetFromCloudList('${bDoc.id}')" class="px-2.5 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-95 font-bold rounded-lg transition flex items-center gap-1 cursor-pointer text-[11px]">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Borrar
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                safeCreateIcons();
+            }, (error) => {
+                console.error("Cloud budgets query exception:", error);
+            });
+        }
+
+        // 4. Eliminar un presupuesto de la red
+        async function deleteBudgetFromCloudList(id) {
+            if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente el presupuesto "${id}" de la nube?`)) {
+                return;
+            }
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'presupuestos', id);
+                await deleteDoc(docRef);
+                showToast(`Presupuesto "${id}" eliminado correctamente de la red.`, true);
+                if (id === window.currentBudgetCode) {
+                    loadActiveBudgetSync("PRE-GENERAL");
+                }
+            } catch (err) {
+                console.error("Error deleting doc:", err);
+                showToast("Fallo al eliminar de la nube.", false);
+            }
+        }
+
+        function resetLocalBudgets() {
+            window.budgets = {
+                mosquiteras: [],
+                cortinas: [],
+                persianas: [],
+                marcos: [],
+                alfombras: []
+            };
+        }
+
+        function updateCloudIndicator(text, classNames) {
+            const statusIndicator = document.getElementById('cloud-status-indicator');
+            const statusText = document.getElementById('cloud-status-text');
+            if (statusIndicator && statusText) {
+                statusIndicator.className = `w-2.5 h-2.5 rounded-full ${classNames}`;
+                statusText.textContent = text;
+            }
+        }
+
+        // Exponer funciones globales para que se comuniquen con los scripts tradicionales
+        window.uploadBudgetsToCloud = uploadBudgetsToCloud;
+        window.changeBudgetCode = function(newCode) {
+            if(!newCode.trim()) return;
+            loadActiveBudgetSync(newCode);
+            showToast(`Conectado al Presupuesto: ${newCode.toUpperCase()}`, true);
+        };
+        window.loadBudgetFromCloudList = function(id) {
+            loadActiveBudgetSync(id);
+            showToast(`Presupuesto "${id}" cargado con éxito.`, true);
+            // Hacer scroll suave hasta el panel de control o cambiar de vista
+            document.getElementById('input-budget-code').scrollIntoView({ behavior: 'smooth' });
+        };
+        window.deleteBudgetFromCloudList = deleteBudgetFromCloudList;
+        window.refreshAllBudgetsList = refreshAllBudgetsList;
+
+        // Iniciar autenticación
+        startAuth();
+    </script>
+
+    <!-- Script de lógica de tarifas y control de vistas -->
+    <script>
+        // --- 1. BASE DE DATOS TARIFARIA DE ACUDAM ---
+        const DB_TARIFAS = {
+            enrollable_vert: {
+                nombre: "Mosquitera Enrollable Vertical",
+                widths: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                heights: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "plata_gris_bronce", nombre: "Plata, Gris 7016 y Bronce" },
+                    { id: "madera", nombre: "Efecto Madera (Golden Oak / Walnut)" }
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    const baseW_blanco = [
+                        55.64, 58.37, 61.28, 64.14, 67.02, 70.04, 75.18, 80.29, 85.35, 90.44, 95.58, 100.67, 105.81, 110.87, 115.88, 121.23, 126.50, 131.93, 137.33, 142.89
+                    ];
+                    let price = 0;
+                    if (hIdx === 0) {
+                        price = baseW_blanco[wIdx];
+                    } else if (hIdx === 1) { 
+                        price = baseW_blanco[wIdx] + 1.42 + (wIdx * 0.02);
+                    } else { 
+                        const baseH60 = baseW_blanco[wIdx] + 1.42 + (wIdx * 0.02);
+                        price = baseH60 + (hIdx - 1) * (3.23 + (wIdx * 0.001));
+                    }
+                    if (colorId === "plata_gris_bronce") return price * 1.09;
+                    if (colorId === "madera") return price * 1.346;
+                    return price;
+                }
+            },
+            enrollable_lat: {
+                nombre: "Mosquitera Enrollable Lateral 1 Hoja",
+                widths: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                heights: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "plata_gris_bronce", nombre: "Plata, Gris 7016 y Bronce" },
+                    { id: "madera", nombre: "Efecto Madera (Golden Oak / Walnut)" }
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    const baseW_blanco = [
+                        69.10, 72.01, 74.94, 83.44, 86.56, 89.71, 92.80, 95.95, 102.37, 105.60, 112.08, 119.02, 122.35, 129.62, 133.05, 136.49, 144.17, 147.71, 151.28, 154.79
+                    ];
+                    let price = 0;
+                    if (hIdx === 0) {
+                        price = baseW_blanco[wIdx];
+                    } else if (hIdx === 1) { 
+                        price = baseW_blanco[wIdx] + 2.91 + (wIdx * 0.03);
+                    } else { 
+                        const baseH60 = baseW_blanco[wIdx] + 2.91 + (wIdx * 0.03);
+                        price = baseH60 + (hIdx - 1) * (3.10 + (wIdx * 0.002));
+                    }
+                    if (colorId === "plata_gris_bronce") return price * 1.035;
+                    if (colorId === "madera") return price * 1.28;
+                    return price;
+                }
+            },
+            corredera_curva: {
+                nombre: "Mosquitera Corredera Curva",
+                widths: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140],
+                heights: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "plata_gris_bronce", nombre: "Plata, Gris 7016 y Bronce" },
+                    { id: "madera", nombre: "Efecto Madera (Golden Oak / Walnut)" }
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    const baseW_blanco = [42.11, 44.18, 46.25, 48.32, 50.40, 52.47, 54.54, 56.62, 58.69, 60.76];
+                    let price = 0;
+                    if (hIdx === 0) {
+                        price = baseW_blanco[wIdx];
+                    } else {
+                        price = baseW_blanco[wIdx] + (hIdx * (2.49 + wIdx * 0.005));
+                    }
+                    if (colorId === "plata_gris_bronce") return price * 1.15;
+                    if (colorId === "madera") return price * 1.39;
+                    return price;
+                }
+            },
+            fija: {
+                nombre: "Mosquitera Fija",
+                widths: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140],
+                heights: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "bronce", nombre: "Bronce, Plata y Gris 7016" }
+                ],
+                prices_blanco: [
+                    [36.89, 38.58, 40.25, 41.92, 43.59, 45.29, 46.96, 48.63, 50.32, 51.99],
+                    [39.04, 40.71, 42.41, 44.08, 45.75, 47.42, 49.11, 50.78, 52.45, 54.12],
+                    [41.20, 42.87, 44.54, 46.21, 47.91, 49.58, 51.25, 52.94, 54.61, 56.28],
+                    [43.33, 45.03, 46.70, 48.37, 50.04, 51.73, 53.40, 55.07, 56.74, 58.44],
+                    [45.49, 47.16, 48.83, 50.53, 52.20, 53.87, 55.56, 57.23, 58.90, 60.57],
+                    [47.65, 49.32, 50.99, 52.66, 54.35, 56.02, 57.69, 59.36, 61.06, 62.73],
+                    [49.78, 51.45, 53.15, 54.82, 56.49, 58.18, 59.85, 61.52, 63.19, 64.89],
+                    [57.08, 53.61, 55.28, 56.97, 58.64, 60.31, 61.98, 63.68, 65.35, 67.02],
+                    [56.23, 57.90, 59.59, 61.26, 62.93, 64.60, 66.30, 67.97, 69.64, 71.33],
+                    [58.39, 60.06, 61.73, 63.42, 65.09, 66.76, 68.43, 70.13, 71.80, 73.47],
+                    [60.52, 62.22, 63.88, 65.57, 67.25, 68.92, 70.59, 72.27, 73.94, 75.83],
+                    [62.68, 64.38, 66.06, 67.73, 69.40, 71.07, 72.77, 74.43, 76.10, 77.99],
+                    [65.73, 67.40, 69.07, 70.75, 72.41, 74.09, 75.83, 77.49, 79.22, 80.14],
+                    [67.89, 69.56, 71.21, 72.88, 74.56, 76.24, 77.99, 79.64, 81.38, 82.28],
+                    [70.02, 71.70, 73.37, 75.05, 76.71, 78.39, 80.14, 81.80, 83.51, 84.43],
+                    [72.18, 73.86, 75.52, 77.21, 78.87, 80.55, 82.28, 83.94, 85.67, 86.59],
+                    [74.34, 76.01, 77.69, 79.37, 81.04, 82.71, 84.43, 86.10, 87.83, 88.72],
+                    [76.47, 78.16, 79.84, 81.52, 83.20, 84.88, 86.59, 88.26, 89.96, 90.88],
+                    [78.63, 80.31, 81.99, 83.68, 85.35, 87.04, 88.72, 90.41, 92.11, 93.04],
+                    [80.79, 82.47, 84.15, 85.83, 87.51, 89.20, 90.88, 92.57, 94.27, 95.21]
+                ],
+                prices_bronce: [
+                    [42.42, 44.37, 46.29, 48.21, 50.13, 52.08, 54.00, 55.91, 57.87, 59.79],
+                    [44.90, 46.82, 48.77, 50.69, 52.61, 54.53, 56.48, 58.40, 60.32, 62.24],
+                    [47.38, 49.30, 51.22, 53.14, 55.09, 57.01, 58.93, 60.88, 62.80, 64.72],
+                    [49.83, 51.78, 53.70, 55.62, 57.55, 59.49, 61.41, 63.33, 65.26, 67.20],
+                    [52.32, 54.24, 56.16, 58.11, 60.03, 61.95, 63.90, 65.82, 67.74, 69.66],
+                    [54.80, 56.72, 58.64, 60.56, 62.51, 64.43, 66.35, 68.27, 70.22, 72.14],
+                    [57.25, 59.17, 61.12, 63.04, 64.96, 66.91, 68.83, 70.75, 72.67, 74.62],
+                    [65.64, 61.65, 63.57, 65.52, 67.44, 69.36, 71.28, 73.23, 75.15, 77.07],
+                    [64.13, 64.13, 66.05, 67.97, 69.92, 71.84, 73.76, 75.68, 77.63, 79.55],
+                    [66.58, 66.58, 68.53, 70.45, 72.37, 74.29, 76.24, 78.16, 80.08, 82.03],
+                    [69.07, 69.07, 70.99, 72.94, 74.86, 76.78, 78.70, 80.65, 82.57, 84.49],
+                    [73.11, 73.11, 75.05, 76.99, 79.11, 80.17, 82.10, 84.10, 86.10, 87.20],
+                    [75.59, 75.59, 77.51, 79.44, 81.59, 82.65, 84.62, 86.62, 88.62, 89.69],
+                    [78.08, 78.08, 80.01, 81.91, 84.07, 85.11, 87.20, 89.20, 91.20, 92.17],
+                    [80.53, 80.53, 82.52, 84.40, 86.52, 87.59, 89.69, 91.70, 93.70, 94.62],
+                    [83.01, 83.01, 84.99, 86.88, 89.01, 90.07, 92.17, 94.18, 96.18, 97.10],
+                    [85.49, 85.49, 87.49, 89.35, 91.49, 92.52, 94.62, 96.64, 98.64, 99.58],
+                    [87.94, 87.94, 89.93, 91.81, 93.94, 95.00, 97.10, 99.10, 101.10, 102.03],
+                    [90.42, 90.42, 92.42, 94.30, 96.42, 97.45, 99.58, 101.55, 103.55, 104.51],
+                    [92.91, 92.91, 94.90, 96.79, 98.90, 99.94, 102.03, 104.03, 106.03, 106.97]
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    if (colorId === "blanco") return this.prices_blanco[hIdx][wIdx];
+                    return this.prices_bronce[hIdx][wIdx];
+                }
+            },
+            puerta_practicable: {
+                nombre: "Mosquitera Puerta Practicable",
+                widths: [60, 70, 80, 90, 100],
+                heights: [190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "bronce", nombre: "Bronce, Plata y Gris 7016" }
+                ],
+                prices_blanco: [
+                    [302.68, 310.36, 318.01, 325.69, 333.37],
+                    [310.46, 318.16, 325.87, 333.58, 341.28],
+                    [318.24, 325.97, 333.73, 341.46, 349.20],
+                    [326.05, 333.81, 341.57, 349.35, 357.11],
+                    [333.83, 341.64, 349.43, 357.21, 365.02],
+                    [341.64, 349.48, 357.29, 365.12, 372.93]
+                ],
+                prices_bronce: [
+                    [363.19, 372.42, 381.64, 390.81, 400.03],
+                    [372.55, 381.79, 391.04, 400.29, 409.51],
+                    [381.90, 391.17, 400.49, 409.74, 419.04],
+                    [391.27, 400.60, 409.87, 419.22, 428.54],
+                    [400.62, 409.97, 419.32, 428.67, 438.02],
+                    [409.97, 419.35, 428.72, 438.15, 447.53]
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    if (colorId === "blanco") return this.prices_blanco[hIdx][wIdx];
+                    return this.prices_bronce[hIdx][wIdx];
+                }
+            }
+        };
+
+        const MARCOS_STANDARD_DB = [
+            { size: "10X15", w: 10, h: 15, prices: [7.49, 10.14, 10.80, 13.84, 16.36, 19.30, 23.81, 31.01, 37.10, 43.79, 46.00, 54.16, 64.99, 81.31], brillo: 1.00, mate: 1.96, ppvs: 4.67 },
+            { size: "13X18", w: 13, h: 18, prices: [9.30, 12.59, 13.38, 17.17, 20.30, 23.91, 29.54, 38.46, 45.99, 54.32, 57.09, 67.16, 80.59, 100.84], brillo: 1.09, mate: 2.21, ppvs: 5.79 },
+            { size: "15X20", w: 15, h: 20, prices: [10.50, 14.20, 15.11, 19.40, 22.57, 26.66, 32.16, 38.93, 47.37, 54.68, 61.18, 74.35, 88.07, 110.60], brillo: 1.18, mate: 2.49, ppvs: 6.54 },
+            { size: "16X22", w: 16, h: 22, prices: [11.09, 13.05, 15.80, 19.95, 23.00, 27.15, 34.77, 39.45, 48.22, 54.97, 65.15, 76.46, 91.55, 114.43], brillo: 1.31, mate: 2.74, ppvs: 7.10 },
+            { size: "18X24", w: 18, h: 24, prices: [12.26, 14.43, 16.73, 21.42, 25.43, 30.01, 38.42, 43.62, 53.28, 58.21, 66.87, 78.57, 94.28, 117.94], brillo: 1.50, mate: 2.74, ppvs: 7.85 },
+            { size: "20X20", w: 20, h: 20, prices: [11.25, 13.70, 15.72, 21.07, 24.20, 28.09, 35.27, 42.98, 50.77, 55.58, 64.66, 76.04, 91.25, 114.11], brillo: 1.65, mate: 3.21, ppvs: 7.45 },
+            { size: "20X25", w: 20, h: 25, prices: [12.26, 15.11, 17.64, 22.97, 26.83, 31.67, 39.41, 48.43, 57.03, 62.60, 70.06, 82.38, 98.93, 123.73], brillo: 1.68, mate: 3.24, ppvs: 8.85 },
+            { size: "20X50", w: 20, h: 50, prices: [19.62, 24.02, 27.88, 35.63, 42.20, 49.66, 53.60, 64.85, 79.14, 86.23, 97.04, 114.11, 136.93, 171.29], brillo: 4.05, mate: 7.73, ppvs: 11.84 },
+            { size: "22X27", w: 22, h: 27, prices: [13.35, 16.49, 19.20, 24.99, 29.21, 34.48, 42.92, 52.77, 62.09, 68.11, 74.77, 87.48, 105.65, 132.12], brillo: 2.46, mate: 4.64, ppvs: 9.63 },
+            { size: "24X30", w: 24, h: 30, prices: [14.25, 17.60, 20.52, 26.26, 31.12, 36.68, 45.53, 55.08, 64.67, 72.63, 79.74, 93.76, 112.55, 140.80], brillo: 2.46, mate: 4.64, ppvs: 9.84 },
+            { size: "24X33", w: 24, h: 33, prices: [15.01, 18.58, 21.66, 27.74, 32.84, 41.77, 48.05, 58.16, 68.27, 77.00, 83.48, 96.84, 115.54, 144.47], brillo: 3.61, mate: 6.98, ppvs: 10.41 },
+            { size: "27X35", w: 27, h: 35, prices: [16.98, 19.20, 22.38, 28.66, 33.92, 41.25, 49.66, 60.09, 70.56, 79.97, 86.28, 101.49, 121.71, 152.21], brillo: 3.74, mate: 7.07, ppvs: 10.81 },
+            { size: "30X30", w: 30, h: 30, prices: [16.42, 21.23, 21.43, 31.63, 36.34, 40.73, 50.05, 60.19, 70.33, 77.71, 85.01, 100.19, 119.15, 149.25], brillo: 3.30, mate: 6.11, ppvs: 10.34 },
+            { size: "30X36", w: 30, h: 36, prices: [18.43, 22.72, 25.71, 33.76, 39.96, 47.10, 56.07, 65.95, 75.86, 84.21, 93.27, 109.07, 130.82, 163.62], brillo: 3.74, mate: 7.07, ppvs: 10.81 },
+            { size: "30X40", w: 30, h: 40, prices: [19.62, 24.02, 27.88, 35.63, 42.20, 49.66, 59.05, 69.38, 79.69, 88.59, 97.04, 114.11, 136.93, 171.29], brillo: 4.11, mate: 7.73, ppvs: 11.84 },
+            { size: "30X42", w: 30, h: 42, prices: [20.61, 24.70, 28.66, 36.64, 43.41, 51.06, 60.75, 71.35, 81.98, 91.16, 99.80, 117.39, 140.83, 176.17], brillo: 4.36, mate: 8.26, ppvs: 12.31 },
+            { size: "30X50", w: 30, h: 50, prices: [26.08, 26.94, 31.27, 41.44, 48.98, 57.70, 67.40, 78.19, 89.01, 101.23, 107.80, 126.79, 152.11, 190.28], brillo: 5.45, mate: 10.44, ppvs: 13.24 },
+            { size: "30X70", w: 30, h: 70, prices: [29.47, 34.73, 39.78, 50.64, 59.58, 67.91, 74.51, 91.10, 107.69, 123.01, 129.29, 152.11, 182.47, 228.38], brillo: 8.88, mate: 16.11, ppvs: 15.42 },
+            { size: "30X90", w: 30, h: 90, prices: [35.24, 41.04, 47.53, 60.41, 73.68, 83.92, 93.75, 109.11, 126.50, 146.62, 150.94, 177.50, 219.99, 266.41], brillo: 11.78, mate: 22.49, ppvs: 21.00 },
+            { size: "33X41", w: 33, h: 41, prices: [22.60, 25.25, 29.93, 38.14, 45.24, 54.04, 63.04, 75.93, 84.33, 95.28, 102.40, 120.45, 144.50, 180.78], brillo: 6.70, mate: 12.65, ppvs: 12.93 },
+            { size: "35X40", w: 35, h: 40, prices: [22.61, 25.25, 29.93, 38.16, 45.23, 54.03, 63.04, 75.92, 84.33, 95.28, 102.40, 120.45, 144.50, 180.78], brillo: 6.70, mate: 12.65, ppvs: 12.93 },
+            { size: "35X50", w: 35, h: 50, prices: [25.61, 28.67, 33.32, 44.00, 51.93, 59.51, 71.43, 82.79, 93.69, 103.64, 113.20, 133.13, 159.69, 199.77], brillo: 6.73, mate: 12.84, ppvs: 13.33 },
+            { size: "38X46", w: 38, h: 46, prices: [25.61, 28.66, 33.33, 44.00, 51.95, 59.50, 71.44, 82.79, 93.69, 103.64, 113.20, 133.13, 159.69, 199.77], brillo: 7.17, mate: 14.95, ppvs: 14.33 },
+            { size: "40X50", w: 40, h: 50, prices: [26.58, 31.23, 36.25, 46.63, 54.71, 64.41, 75.53, 90.36, 98.37, 108.65, 118.56, 139.43, 167.29, 209.29], brillo: 7.17, mate: 14.95, ppvs: 14.33 },
+            { size: "40X60", w: 40, h: 60, prices: [29.47, 34.73, 39.78, 50.64, 59.58, 67.91, 74.51, 91.10, 107.69, 123.01, 129.29, 152.11, 182.47, 228.38], brillo: 8.88, mate: 16.11, ppvs: 15.42 },
+            { size: "40X70", w: 40, h: 70, prices: [32.35, 37.72, 43.71, 55.61, 65.82, 77.40, 85.44, 107.30, 117.18, 131.71, 140.18, 164.89, 197.79, 247.33], brillo: 10.09, mate: 19.35, ppvs: 17.95 },
+            { size: "40X90", w: 40, h: 90, prices: [45.19, 47.50, 54.93, 69.82, 77.29, 93.30, 102.50, 113.53, 135.85, 147.93, 161.70, 190.18, 228.15, 285.43], brillo: 14.02, mate: 26.79, ppvs: 24.14 },
+            { size: "45X55", w: 45, h: 55, prices: [29.47, 34.73, 39.78, 50.64, 59.58, 67.91, 74.51, 91.10, 107.69, 123.01, 129.29, 152.11, 182.47, 228.38], brillo: 8.88, mate: 16.11, ppvs: 15.42 },
+            { size: "50X60", w: 50, h: 60, prices: [32.35, 37.72, 43.71, 55.61, 70.87, 77.40, 85.47, 98.18, 117.18, 130.04, 140.18, 164.89, 197.79, 247.33], brillo: 10.09, mate: 19.35, ppvs: 17.95 },
+            { size: "55X65", w: 55, h: 65, prices: [35.24, 41.04, 47.53, 60.41, 73.68, 83.92, 97.29, 109.11, 126.50, 139.59, 150.94, 177.50, 216.48, 266.41], brillo: 11.78, mate: 22.49, ppvs: 21.00 },
+            { size: "50X70", w: 50, h: 70, prices: [35.24, 41.04, 47.53, 60.41, 73.68, 83.92, 97.29, 109.11, 126.50, 139.59, 150.94, 177.50, 216.48, 266.41], brillo: 11.78, mate: 22.49, ppvs: 21.00 },
+            { size: "50X100", w: 50, h: 100, prices: [48.36, 54.68, 63.26, 76.93, 86.99, 100.48, 111.19, 134.12, 154.53, 171.81, 183.19, 215.50, 258.55, 323.50], brillo: 18.23, mate: 36.30, ppvs: 30.38 },
+            { size: "60X73", w: 60, h: 73, prices: [42.13, 48.61, 56.17, 71.41, 81.55, 92.25, 103.83, 122.21, 137.92, 152.11, 163.81, 192.68, 231.04, 289.20], brillo: 16.17, mate: 30.84, ppvs: 25.73 },
+            { size: "60X80", w: 60, h: 80, prices: [44.36, 51.18, 59.11, 75.16, 85.84, 97.09, 109.28, 128.67, 145.18, 161.31, 172.46, 202.82, 243.33, 304.42], brillo: 16.17, mate: 30.84, ppvs: 25.73 },
+            { size: "60X90", w: 60, h: 90, prices: [52.33, 54.68, 63.26, 76.93, 86.99, 100.48, 111.19, 134.12, 154.53, 171.81, 183.19, 215.50, 258.55, 323.50], brillo: 18.23, mate: 36.30, ppvs: 30.38 },
+            { size: "70X100", w: 70, h: 100, prices: [58.79, 71.12, 78.69, 91.75, 104.37, 114.98, 124.99, 148.55, 173.34, 194.28, 204.84, 240.93, 278.44, 361.60], brillo: 23.68, mate: 40.81, ppvs: 36.61 },
+            { size: "80X100", w: 80, h: 100, prices: [62.25, 75.38, 87.10, 102.86, 115.70, 127.82, 142.68, 161.08, 182.70, 199.70, 215.60, 253.54, 297.17, 380.55], brillo: 27.26, mate: 51.87, ppvs: 38.79 },
+            { size: "90X100", w: 90, h: 100, prices: [62.25, 75.38, 87.10, 102.86, 115.70, 127.82, 142.68, 161.08, 182.70, 199.70, 215.60, 253.54, 304.22, 380.55], brillo: 27.26, mate: 51.87, ppvs: 38.79 },
+            { size: "90X110", w: 90, h: 110, prices: [76.93, 96.98, 110.68, 135.28, 146.68, 155.98, 172.22, 182.59, 204.91, 228.03, 237.09, 278.90, 327.53, 418.62], brillo: 36.36, mate: 69.51, ppvs: 43.12 },
+            { size: "100X100", w: 100, h: 100, prices: [76.93, 96.98, 110.68, 135.28, 146.68, 155.98, 172.22, 182.59, 204.91, 228.03, 237.09, 278.90, 327.53, 418.62], brillo: 36.36, mate: 69.51, ppvs: 43.12 },
+            { size: "150X52", w: 150, h: 52, prices: [77.69, 97.97, 111.81, 136.61, 148.15, 157.54, 173.96, 184.43, 206.97, 229.17, 239.46, 281.69, 330.81, 424.57], brillo: 36.92, mate: 70.25, ppvs: 44.05 },
+            { size: "120X90", w: 120, h: 90, prices: [82.95, 101.78, 116.17, 145.05, 158.29, 169.44, 184.43, 195.11, 210.86, 235.99, 247.98, 291.64, 339.33, 437.61], brillo: 43.83, mate: 83.62, ppvs: 47.29 },
+            { size: "110X110", w: 110, h: 110, prices: [84.61, 109.89, 121.76, 161.36, 167.20, 179.17, 196.63, 205.73, 220.19, 244.28, 256.30, 304.32, 365.05, 456.72], brillo: 45.17, mate: 91.22, ppvs: 0.00 },
+            { size: "130X90", w: 130, h: 90, prices: [84.61, 109.89, 121.76, 161.36, 167.20, 179.17, 196.63, 205.73, 220.19, 244.28, 256.30, 304.32, 365.05, 456.72], brillo: 45.17, mate: 91.22, ppvs: 49.54 },
+            { size: "130X100", w: 130, h: 100, prices: [88.42, 124.96, 139.52, 163.95, 182.70, 196.34, 208.44, 216.23, 228.92, 247.78, 268.30, 316.96, 380.23, 475.71], brillo: 47.23, mate: 95.40, ppvs: 51.78 },
+            { size: "140X100", w: 140, h: 100, prices: [92.29, 130.38, 145.56, 171.09, 190.64, 204.85, 217.51, 225.61, 238.87, 262.86, 280.26, 329.61, 395.41, 494.69], brillo: 52.22, mate: 105.77, ppvs: 54.02 }
+        ];
+
+        const DB_M2 = {
+            cortinas: {
+                modelos: [
+                    { id: "cinta_opaca_300", nombre: "Cinta Plástico Opaca - Serie 300", m2: 38.90, info: "Series 300 / 330 / 350" },
+                    { id: "cinta_transp_330", nombre: "Cinta Plástico Transparente - Serie 330/350", m2: 38.90, info: "Series 330 / 350" },
+                    { id: "cinta_transp_360", nombre: "Cinta Plástico Transparente - Serie 360", m2: 41.20, info: "Serie 360" },
+                    { id: "cinta_opaca_370", nombre: "Cinta Plástico Opaca - Serie 370", m2: 41.20, info: "Serie 370" },
+                    { id: "cinta_plast_380", nombre: "Cinta Plástico - Serie 380", m2: 42.80, info: "Serie 380" },
+                    { id: "canutillo", nombre: "Canutillo", m2: 53.60, info: "Modelo Canutillo clásico" },
+                    { id: "primavera_470", nombre: "Primavera - Serie 470", m2: 61.70, info: "Serie 470" },
+                    { id: "marina_480", nombre: "Marina - Serie 480", m2: 61.70, info: "Serie 480" },
+                    { id: "bolonia_900", nombre: "Bolonia - Serie 900", m2: 62.50, info: "Serie 900" },
+                    { id: "cantabria_490", nombre: "Cantabria - Serie 490", m2: 63.30, info: "Serie 490" },
+                    { id: "florida_opaca_400", nombre: "Florida Opaca - Serie 400", m2: 64.00, info: "Florida Series 400 / 430 / 450" },
+                    { id: "florida_trans_430", nombre: "Florida Transparente - Serie 430", m2: 64.00, info: "Serie 430" },
+                    { id: "florida_metal_450", nombre: "Florida Metalizado - Serie 450", m2: 64.00, info: "Serie 450" },
+                    { id: "inca_580", nombre: "Inca - Serie 580", m2: 65.50, info: "Inca / Mallorca (Series 580 / 800)" },
+                    { id: "mallorca_800", nombre: "Mallorca - Serie 800", m2: 65.50, info: "Serie 800" },
+                    { id: "formentera_550", nombre: "Formentera - Serie 550", m2: 69.20, info: "Formentera, Menorca, Ibiza, Manacor, Verona" },
+                    { id: "menorca_560", nombre: "Menorca - Serie 560", m2: 69.20, info: "Serie 560" },
+                    { id: "ibiza_600", nombre: "Ibiza - Serie 600", m2: 69.20, info: "Serie 600" },
+                    { id: "manacor_700", nombre: "Manacor - Serie 700", m2: 69.20, info: "Serie 700" },
+                    { id: "verona_750", nombre: "Verona - Serie 750", m2: 69.20, info: "Serie 750" },
+                    { id: "cadaques_590", nombre: "Cadaqués - Serie 590", m2: 71.30, info: "Serie 590" },
+                    { id: "palma_570", nombre: "Palma - Serie 570", m2: 75.80, info: "Serie 570" },
+                    { id: "miami", nombre: "Miami", m2: 86.60, info: "Miami acabado liso" },
+                    { id: "cadena_alum_a", nombre: "Cadena Aluminio Serie 200 (Colores A)", m2: 95.65, info: "Rojo, Amarillo, Verde, Azul, Blanco y Marrón" },
+                    { id: "cadena_alum_b", nombre: "Cadena Aluminio Serie 200 (Colores B)", m2: 107.15, info: "Negro, Gris, Naranja" },
+                    { id: "cadena_alum_ab", nombre: "Cadena Aluminio Serie 200 (Combinada A y B)", m2: 107.15, info: "Mezcla de tonalidades A y B" }
+                ]
+            },
+            persianas: {
+                modelos: [
+                    { id: "ali_plastico", nombre: "Alicantina Plástico", m2: 51.95, info: "Marrón, Marfil, Verde, Blanca, Nogal y Gris" },
+                    { id: "ali_mad_natural", nombre: "Alicantina Madera Natural", m2: 60.30, info: "Madera de pino sin barnizar" },
+                    { id: "ali_mad_barnizada", nombre: "Alicantina Madera Natural Barnizada", m2: 62.90, info: "Barnizado brillo protector" },
+                    { id: "ali_mad_pintada", nombre: "Alicantina Madera Pintada", m2: 62.90, info: "Pintada Nogal, Castaño o Verde" }
+                ]
+            }
+        };
+
+        const DB_CONSUMIBLES = {
+            espejo_3_1: { nombre: "Espejo 3 mm", precioM2: 62.36 },
+            espejo_3_2: { nombre: "Espejo 3 mm Bis", precioM2: 69.98 },
+            espejo_4_1: { nombre: "Espejo 4 mm", precioM2: 70.57 },
+            espejo_4_2: { nombre: "Espejo 4 mm Bis", precioM2: 85.27 },
+            canto_pulido_metro: 8.13,
+            dm_2_5: { nombre: "Trasera DM 2,5 mm", precioM2: 10.05 },
+            dm_4: { nombre: "Trasera DM 4 mm", precioM2: 19.66 },
+            grapas_grandes: 0.78,
+            grapas_pequenas: 0.45,
+            arraglass: { nombre: "PS Arraglass 1,5 mm", precioM2: 49.15 },
+            arrasol: { nombre: "Arrasol 2 mm", precioM2: 64.78 }
+        };
+
+        const CATEGORIAS = {
+            mosquiteras: {
+                nombre: "Mosquiteras",
+                icono: "calculator",
+                colorClase: "bg-emerald-600",
+                colorFondo: "bg-emerald-50 text-emerald-900",
+                configurado: true,
+                tipoCalculo: "matricial",
+                defaultModel: "enrollable_vert",
+                modelos: [
+                    { id: "enrollable_vert", nombre: "Enrollable Vertical" },
+                    { id: "enrollable_lat", nombre: "Enrollable Lateral (1 Hoja)" },
+                    { id: "corredera_curva", nombre: "Corredera Curva" },
+                    { id: "fija", nombre: "Fija" },
+                    { id: "puerta_practicable", nombre: "Puerta Practicable" }
+                ]
+            },
+            cortinas: {
+                nombre: "Cortinas de puerta",
+                icono: "door-open",
+                colorClase: "bg-indigo-600",
+                colorFondo: "bg-indigo-50 text-indigo-900",
+                configurado: true,
+                tipoCalculo: "m2",
+                defaultModel: "cinta_opaca_300",
+                modelos: DB_M2.cortinas.modelos
+            },
+            persianas: {
+                nombre: "Persianas",
+                icono: "chevrons-down",
+                colorClase: "bg-amber-600",
+                colorFondo: "bg-amber-50 text-amber-900",
+                configurado: true,
+                tipoCalculo: "m2",
+                defaultModel: "ali_plastico",
+                modelos: DB_M2.persianas.modelos
+            },
+            marcos: {
+                nombre: "Marcos",
+                icono: "frame",
+                colorClase: "bg-rose-600",
+                colorFondo: "bg-rose-50 text-rose-900",
+                configurado: true, 
+                tipoCalculo: "matricial",
+                defaultModel: "marco_1",
+                modelos: Array.from({length: 14}, (_, i) => ({ id: `marco_${i+1}`, nombre: `Moldura ${i+1}` }))
+            },
+            alfombras: {
+                nombre: "Alfombras",
+                icono: "layers",
+                colorClase: "bg-cyan-600",
+                colorFondo: "bg-cyan-50 text-cyan-900",
+                configurado: false,
+                tipoCalculo: "matricial",
+                defaultModel: "",
+                modelos: []
+            }
+        };
+
+        // --- VARIABLES DE ESTADO ---
+        window.currentCategory = "home";
+        window.selectedProduct = "enrollable_vert";
+        window.selectedColor = "blanco";
+        window.activePrice = 0;
+        window.activeMatchedSize = "";
+        
+        window.activeConsumibles = {
+            espejoId: "ninguno",
+            cantoPulido: "no",
+            traseraId: "ninguno",
+            grapasGrandes: 0,
+            grapasPequenas: 0,
+            plasticosId: "ninguno",
+            desglose: {}
+        };
+
+        // Estructura de presupuestos global
+        window.budgets = {
+            mosquiteras: [],
+            cortinas: [],
+            persianas: [],
+            marcos: [],
+            alfombras: []
+        };
+
+        window.onload = function() {
+            safeCreateIcons();
+            goToHome();
+            document.getElementById('print-date').textContent = new Date().toLocaleDateString('es-ES');
+        };
+
+        function safeCreateIcons() {
+            try {
+                if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.warn("Lucide Icons no se pudo cargar.", e);
+            }
+        }
+
+        // --- SISTEMA DE NAVEGACIÓN ---
+        window.goToHome = function() {
+            window.currentCategory = "home";
+            document.getElementById('panel-home').classList.remove('hidden');
+            document.getElementById('panel-tarificador').classList.add('hidden');
+            resetNavActiveClasses();
+            document.getElementById('nav-home').classList.add('bg-slate-700', 'text-white');
+            if (window.refreshAllBudgetsList) {
+                window.refreshAllBudgetsList();
+            }
+            safeCreateIcons();
+        };
+
+        window.switchCategory = function(catId) {
+            window.currentCategory = catId;
+            const catInfo = CATEGORIAS[catId];
+            
+            document.getElementById('panel-home').classList.add('hidden');
+            document.getElementById('panel-tarificador').classList.remove('hidden');
+
+            resetNavActiveClasses();
+            const activeNavBtn = document.getElementById(`nav-${catId}`);
+            if (activeNavBtn) {
+                activeNavBtn.classList.add('bg-slate-700', 'text-white');
+            }
+
+            document.getElementById('category-active-title').textContent = catInfo.nombre;
+            
+            const badgeIcon = document.getElementById('category-badge-icon');
+            badgeIcon.className = `p-1.5 rounded-lg text-white ${catInfo.colorClase}`;
+            badgeIcon.innerHTML = `<i data-lucide="${catInfo.icono}" class="w-5 h-5"></i>`;
+
+            document.getElementById('input-ancho').value = "";
+            document.getElementById('input-alto').value = "";
+            resetConsumiblesForm();
+
+            const fieldsContainer = document.getElementById('calculator-fields');
+            const placeholderContainer = document.getElementById('calculator-placeholder');
+            const matrixPanel = document.getElementById('panel-matrix-container');
+            const priceCard = document.getElementById('price-result-card');
+            
+            const tableStandard = document.getElementById('table-standard-wrapper');
+            const m2Alternative = document.getElementById('m2-alternative-wrapper');
+            const consumiblesWrapper = document.getElementById('consumibles-wrapper');
+            const priceBreakdown = document.getElementById('price-breakdown-wrapper');
+
+            if (catInfo.configurado) {
+                fieldsContainer.classList.remove('hidden');
+                matrixPanel.classList.remove('hidden');
+                priceCard.classList.remove('hidden');
+                placeholderContainer.classList.add('hidden');
+
+                const selectTipo = document.getElementById('select-tipo');
+                selectTipo.innerHTML = "";
+                catInfo.modelos.forEach(mod => {
+                    const opt = document.createElement('option');
+                    opt.value = mod.id;
+                    opt.textContent = mod.nombre;
+                    selectTipo.appendChild(opt);
+                });
+
+                window.selectedProduct = catInfo.defaultModel;
+                selectTipo.value = window.selectedProduct;
+
+                if (catInfo.typeCalculo === "matricial" || catInfo.tipoCalculo === "matricial") {
+                    tableStandard.classList.remove('hidden');
+                    m2Alternative.classList.add('hidden');
+                    
+                    if (catId === "marcos") {
+                        document.getElementById('color-selection-wrapper').classList.add('hidden');
+                        document.getElementById('cristal-selection-wrapper').classList.remove('hidden');
+                        document.getElementById('select-cristal').value = "no";
+                        consumiblesWrapper.classList.remove('hidden');
+                        priceBreakdown.classList.remove('hidden');
+                        document.getElementById('panel-matrix-title-text').textContent = "Tabla Catálogo de Marcos 2025";
+                    } else {
+                        document.getElementById('color-selection-wrapper').classList.remove('hidden');
+                        document.getElementById('cristal-selection-wrapper').classList.add('hidden');
+                        consumiblesWrapper.classList.add('hidden');
+                        priceBreakdown.classList.add('hidden');
+                        document.getElementById('panel-matrix-title-text').textContent = "Matriz de Tarifas Activa";
+                    }
+
+                    document.getElementById('panel-matrix-dimension-label').classList.remove('hidden');
+                    document.getElementById('matched-size-row').classList.remove('hidden');
+                    document.getElementById('m2-calculated-row').classList.add('hidden');
+                } else {
+                    tableStandard.classList.add('hidden');
+                    m2Alternative.classList.remove('hidden');
+                    document.getElementById('color-selection-wrapper').classList.add('hidden');
+                    document.getElementById('cristal-selection-wrapper').classList.add('hidden');
+                    consumiblesWrapper.classList.add('hidden');
+                    priceBreakdown.classList.add('hidden');
+                    document.getElementById('panel-matrix-title-text').textContent = "Precios Confección M²";
+                    document.getElementById('panel-matrix-dimension-label').classList.add('hidden');
+                    document.getElementById('matched-size-row').classList.add('hidden');
+                    document.getElementById('m2-calculated-row').classList.remove('hidden');
+                    renderM2RatesList();
+                }
+
+                document.getElementById('budget-category-title').textContent = `Presupuesto Acumulado: ${catInfo.nombre}`;
+                document.getElementById('budget-sum-label').textContent = `Total Neto Sección ${catInfo.nombre}`;
+
+                onProductChange();
+            } else {
+                fieldsContainer.classList.add('hidden');
+                matrixPanel.classList.add('hidden');
+                priceCard.classList.add('hidden');
+                placeholderContainer.classList.remove('hidden');
+                window.activePrice = 0;
+                window.activeMatchedSize = "";
+                document.getElementById('matrix-table').innerHTML = "";
+            }
+
+            renderBudget();
+            safeCreateIcons();
+        };
+
+        function resetNavActiveClasses() {
+            const navs = ['nav-home', 'nav-mosquiteras', 'nav-cortinas', 'nav-persianas', 'nav-marcos', 'nav-alfombras'];
+            navs.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.classList.remove('bg-slate-700', 'text-white');
+            });
+        }
+
+        function resetConsumiblesForm() {
+            const selectEspejo = document.getElementById('select-espejo');
+            const selectCanto = document.getElementById('select-canto-pulido');
+            const selectTrasera = document.getElementById('select-trasera-dm');
+            const inputGGrandes = document.getElementById('input-grapas-grandes');
+            const inputGPequenas = document.getElementById('input-grapas-pequenas');
+            const selectPlast = document.getElementById('select-plasticos');
+
+            if (selectEspejo) selectEspejo.value = "ninguno";
+            if (selectCanto) {
+                selectCanto.value = "no";
+                selectCanto.disabled = true;
+            }
+            if (selectTrasera) selectTrasera.value = "ninguno";
+            if (inputGGrandes) inputGGrandes.value = "0";
+            if (inputGPequenas) inputGPequenas.value = "0";
+            if (selectPlast) selectPlast.value = "ninguno";
+
+            window.activeConsumibles = {
+                espejoId: "ninguno",
+                cantoPulido: "no",
+                traseraId: "ninguno",
+                grapasGrandes: 0,
+                grapasPequenas: 0,
+                plasticosId: "ninguno",
+                desglose: {
+                    baseMarco: 0,
+                    cristal: 0,
+                    espejo: 0,
+                    canto: 0,
+                    trasera: 0,
+                    grapas: 0,
+                    plasticos: 0
+                }
+            };
+        }
+
+        // --- COMPORTAMIENTO DEL BUSCADOR ---
+        window.onProductChange = function() {
+            if (!CATEGORIAS[window.currentCategory].configurado) return;
+
+            window.selectedProduct = document.getElementById('select-tipo').value;
+
+            if (CATEGORIAS[window.currentCategory].tipoCalculo === "matricial") {
+                if (window.currentCategory === "mosquiteras") {
+                    const product = DB_TARIFAS[window.selectedProduct];
+                    document.getElementById('color-selection-wrapper').classList.remove('hidden');
+                    const containerColor = document.getElementById('color-swatches');
+                    containerColor.innerHTML = "";
+
+                    product.colores.forEach((col, idx) => {
+                        if (idx === 0) window.selectedColor = col.id;
+
+                        const btn = document.createElement('button');
+                        btn.id = `btn-color-${col.id}`;
+                        btn.type = "button";
+                        btn.onclick = () => selectColor(col.id);
+                        btn.textContent = col.nombre;
+                        btn.className = `p-2.5 border text-xs font-semibold rounded-xl text-center transition-all duration-200 cursor-pointer ${
+                            idx === 0 
+                            ? 'border-emerald-600 bg-emerald-50 text-emerald-900 shadow-sm' 
+                            : 'border-slate-200 hover:bg-slate-50 text-slate-700 bg-white'
+                        }`;
+                        containerColor.appendChild(btn);
+                    });
+                } else if (window.currentCategory === "marcos") {
+                    window.selectedColor = "estandar";
+                }
+
+                renderMatrixTable();
+            } else {
+                highlightM2RateListItem(window.selectedProduct);
+            }
+            
+            calculatePrice();
+        };
+
+        window.selectColor = function(colorId) {
+            window.selectedColor = colorId;
+            const product = DB_TARIFAS[window.selectedProduct];
+            product.colores.forEach(col => {
+                const btn = document.getElementById(`btn-color-${col.id}`);
+                if (btn) {
+                    if (col.id === colorId) {
+                        btn.className = "p-2.5 border text-xs font-semibold rounded-xl text-center transition-all duration-200 border-emerald-600 bg-emerald-50 text-emerald-900 shadow-sm cursor-pointer";
+                    } else {
+                        btn.className = "p-2.5 border text-xs font-semibold rounded-xl text-center transition-all duration-200 border-slate-200 hover:bg-slate-50 text-slate-700 bg-white cursor-pointer";
+                    }
+                }
+            });
+
+            renderMatrixTable();
+            calculatePrice();
+        };
+
+        window.onCristalChange = function() {
+            renderMatrixTable();
+            calculatePrice();
+        };
+
+        window.onConsumibleChange = function() {
+            const selectEspejo = document.getElementById('select-espejo');
+            const selectCanto = document.getElementById('select-canto-pulido');
+            const selectTrasera = document.getElementById('select-trasera-dm');
+            const inputGGrandes = document.getElementById('input-grapas-grandes');
+            const inputGPequenas = document.getElementById('input-grapas-pequenas');
+            const selectPlast = document.getElementById('select-plasticos');
+
+            if (selectEspejo.value === "ninguno") {
+                selectCanto.value = "no";
+                selectCanto.disabled = true;
+                selectCanto.className = "w-full rounded-xl border border-slate-200 px-3 py-2 bg-slate-100 text-slate-400 text-xs font-medium cursor-pointer disabled:opacity-50";
+            } else {
+                selectCanto.disabled = false;
+                selectCanto.className = "w-full rounded-xl border border-rose-300 px-3 py-2 bg-rose-50/20 text-xs font-medium text-slate-800 cursor-pointer";
+            }
+
+            window.activeConsumibles.espejoId = selectEspejo.value;
+            window.activeConsumibles.cantoPulido = selectCanto.value;
+            window.activeConsumibles.traseraId = selectTrasera.value;
+            window.activeConsumibles.grapasGrandes = Math.max(0, parseInt(inputGGrandes.value) || 0);
+            window.activeConsumibles.grapasPequenas = Math.max(0, parseInt(inputGPequenas.value) || 0);
+            window.activeConsumibles.plasticosId = selectPlast.value;
+
+            calculatePrice();
+        };
+
+        function renderM2RatesList() {
+            const container = document.getElementById('m2-rates-tbody');
+            const categoryData = DB_M2[window.currentCategory];
+            if (!categoryData) return;
+
+            let html = "";
+            categoryData.modelos.forEach(mod => {
+                html += `
+                    <tr id="m2-row-${mod.id}" class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition text-xs" onclick="selectM2ModelViaTable('${mod.id}')">
+                        <td class="p-3 font-semibold text-slate-800">
+                            <div>${mod.nombre}</div>
+                            <div class="text-[10px] text-slate-400 font-normal">${mod.info}</div>
+                        </td>
+                        <td class="p-3 text-right font-bold text-slate-900 font-mono">${mod.m2.toFixed(2)} €</td>
+                    </tr>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        window.selectM2ModelViaTable = function(modelId) {
+            document.getElementById('select-tipo').value = modelId;
+            onProductChange();
+        };
+
+        function highlightM2RateListItem(modelId) {
+            const categoryData = DB_M2[window.currentCategory];
+            if (!categoryData) return;
+
+            categoryData.modelos.forEach(mod => {
+                const row = document.getElementById(`m2-row-${mod.id}`);
+                if (row) {
+                    if (mod.id === modelId) {
+                        row.className = "border-b border-indigo-200 bg-indigo-50 hover:bg-indigo-100 font-bold text-indigo-900 transition text-xs";
+                    } else {
+                        row.className = "border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition text-xs text-slate-700";
+                    }
+                }
+            });
+        }
+
+        function updateAreaScalerVisual(w, h, m2, isMinApplied) {
+            const visualBox = document.getElementById('visual-scaled-box');
+            const visualTxt = document.getElementById('visual-scaled-txt');
+            const visualW = document.getElementById('visual-scaled-w');
+            const visualH = document.getElementById('visual-scaled-h');
+
+            if (isNaN(w) || isNaN(h) || w <= 0 || h <= 0) {
+                visualBox.style.width = "100px";
+                visualBox.style.height = "100px";
+                visualTxt.textContent = "0.00 m²";
+                visualW.textContent = "0cm";
+                visualH.textContent = "0cm";
+                return;
+            }
+
+            const maxPixel = 160;
+            const minPixel = 50;
+            const ratio = w / h;
+
+            let finalW = 100;
+            let finalH = 100;
+
+            if (ratio >= 1) {
+                finalW = maxPixel;
+                finalH = Math.max(minPixel, Math.round(maxPixel / ratio));
+            } else {
+                finalH = maxPixel;
+                finalW = Math.max(minPixel, Math.round(maxPixel * ratio));
+            }
+
+            visualBox.style.width = `${finalW}px`;
+            visualBox.style.height = `${finalH}px`;
+            
+            visualTxt.innerHTML = `${m2.toFixed(2)} m² ${isMinApplied ? '<span class="block text-[8px] bg-indigo-200 px-1 py-0.5 rounded text-indigo-950 mt-1">MÍNIMO</span>' : ''}`;
+            visualW.textContent = `${w} cm`;
+            visualH.textContent = `${h} cm`;
+        }
+
+        function findMatchingStandardMarco(wUser, hUser) {
+            const uMin = Math.min(wUser, hUser);
+            const uMax = Math.max(wUser, hUser);
+
+            for (let i = 0; i < MARCOS_STANDARD_DB.length; i++) {
+                const standard = MARCOS_STANDARD_DB[i];
+                const sMin = Math.min(standard.w, standard.h);
+                const sMax = Math.max(standard.w, standard.h);
+
+                if (uMin <= sMin && uMax <= sMax) {
+                    return { index: i, ...standard };
+                }
+            }
+            return null;
+        }
+
+        // --- CÁLCULO CORE DE PRECIOS ---
+        window.calculatePrice = function() {
+            if (!CATEGORIAS[window.currentCategory].configurado) return;
+
+            const anchoInput = parseFloat(document.getElementById('input-ancho').value);
+            const altoInput = parseFloat(document.getElementById('input-alto').value);
+
+            const displayPrice = document.getElementById('display-price');
+            const displayMatched = document.getElementById('display-matched-size');
+            const displayM2Calc = document.getElementById('display-m2-calc');
+            const displayLimit = document.getElementById('display-limit');
+            const colorLabel = document.getElementById('label-color-selected');
+            const warningBox = document.getElementById('calculator-warning');
+            const warningText = document.getElementById('warning-text');
+            const warningTitle = document.getElementById('warning-title');
+
+            warningBox.classList.add('hidden');
+            clearHighlights();
+
+            if (isNaN(anchoInput) || isNaN(altoInput) || anchoInput <= 0 || altoInput <= 0) {
+                displayPrice.textContent = "0,00";
+                if (displayMatched) displayMatched.textContent = "-";
+                if (displayM2Calc) displayM2Calc.textContent = "-";
+                displayLimit.textContent = "-";
+                window.activePrice = 0;
+                window.activeMatchedSize = "";
+                updateAreaScalerVisual(0, 0, 0, false);
+                togglePriceBreakdown(false);
+                return;
+            }
+
+            const tipoCalculo = CATEGORIAS[window.currentCategory].tipoCalculo;
+
+            if (window.currentCategory === "marcos") {
+                const molduraId = window.selectedProduct;
+                const molduraIndex = parseInt(molduraId.split('_')[1]) - 1;
+                const cristalSelected = document.getElementById('select-cristal').value;
+
+                const cristalLabels = {
+                    no: "Solo Marco",
+                    c_brillo: "Cristal Brillo",
+                    c_mate: "Cristal Mate",
+                    pp_vs: "PP VS"
+                };
+                colorLabel.textContent = cristalLabels[cristalSelected];
+
+                const match = findMatchingStandardMarco(anchoInput, altoInput);
+
+                if (match) {
+                    const basePrice = match.prices[molduraIndex];
+                    let glassCost = 0;
+                    if (cristalSelected === "c_brillo") glassCost = match.brillo;
+                    else if (cristalSelected === "c_mate") glassCost = match.mate;
+                    else if (cristalSelected === "pp_vs") glassCost = match.ppvs;
+
+                    const areaM2 = (anchoInput * altoInput) / 10000;
+                    
+                    let espejoCost = 0;
+                    if (window.activeConsumibles.espejoId !== "ninguno") {
+                        const espejoObj = DB_CONSUMIBLES[window.activeConsumibles.espejoId];
+                        if (espejoObj) espejoCost = areaM2 * espejoObj.precioM2;
+                    }
+
+                    let cantoCost = 0;
+                    if (window.activeConsumibles.espejoId !== "ninguno" && window.activeConsumibles.cantoPulido === "si") {
+                        const wRounded = Math.ceil(anchoInput / 10) * 10;
+                        const hRounded = Math.ceil(altoInput / 10) * 10;
+                        const metrosLineales = (2 * (wRounded + hRounded)) / 100;
+                        cantoCost = metrosLineales * DB_CONSUMIBLES.canto_pulido_metro;
+                    }
+
+                    let traseraCost = 0;
+                    if (window.activeConsumibles.traseraId !== "ninguno") {
+                        const traseraObj = DB_CONSUMIBLES[window.activeConsumibles.traseraId];
+                        if (traseraObj) traseraCost = areaM2 * traseraObj.precioM2;
+                    }
+
+                    const grapasGrandesCost = window.activeConsumibles.grapasGrandes * DB_CONSUMIBLES.grapas_grandes;
+                    const grapasPequenasCost = window.activeConsumibles.grapasPequenas * DB_CONSUMIBLES.grapas_pequenas;
+                    const totalGrapasCost = grapasGrandesCost + grapasPequenasCost;
+
+                    let plasticosCost = 0;
+                    if (window.activeConsumibles.plasticosId !== "ninguno") {
+                        const plastObj = DB_CONSUMIBLES[window.activeConsumibles.plasticosId];
+                        if (plastObj) plasticosCost = areaM2 * plastObj.precioM2;
+                    }
+
+                    const finalPrice = basePrice + glassCost + espejoCost + cantoCost + traseraCost + totalGrapasCost + plasticosCost;
+                    window.activePrice = finalPrice;
+                    window.activeMatchedSize = match.size;
+
+                    window.activeConsumibles.desglose = {
+                        baseMarco: basePrice,
+                        cristal: glassCost,
+                        espejo: espejoCost,
+                        canto: cantoCost,
+                        trasera: traseraCost,
+                        grapas: totalGrapasCost,
+                        plasticos: plasticosCost
+                    };
+
+                    displayPrice.textContent = finalPrice.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    displayMatched.textContent = `${match.size} cm`;
+                    displayLimit.textContent = "Medida Catálogo Oficial ACUDAM 2.025";
+
+                    updatePriceBreakdownUI(window.activeConsumibles.desglose);
+                    highlightMarcoRow(match.index, cristalSelected);
+
+                } else {
+                    window.activePrice = 0;
+                    window.activeMatchedSize = "Fuera de catálogo";
+                    displayPrice.textContent = "---";
+                    displayMatched.textContent = "Excede límites estándar";
+                    displayLimit.textContent = "Ancho/Alto superior a 140x100 cm";
+
+                    warningTitle.textContent = "Dimensiones exceden catálogo estándar";
+                    warningText.textContent = "La pieza es superior al tamaño estándar máximo de 140x100 cm. Contacte para fabricación especial.";
+                    warningBox.classList.remove('hidden');
+                    togglePriceBreakdown(false);
+                }
+
+            } else if (tipoCalculo === "matricial") {
+                togglePriceBreakdown(false);
+                const product = DB_TARIFAS[window.selectedProduct];
+                const colorObj = product.colores.find(c => c.id === window.selectedColor);
+                colorLabel.textContent = colorObj ? colorObj.nombre : "-";
+
+                let widthIdx = product.widths.findIndex(w => anchoInput <= w);
+                let heightIdx = product.heights.findIndex(h => altoInput <= h);
+
+                let outOfBounds = false;
+                let warningMsg = "";
+
+                if (widthIdx === -1) {
+                    widthIdx = product.widths.length - 1;
+                    outOfBounds = true;
+                    warningMsg += `Ancho supera catálogo (${product.widths[product.widths.length - 1]} cm). `;
+                }
+
+                if (heightIdx === -1) {
+                    heightIdx = product.heights.length - 1;
+                    outOfBounds = true;
+                    warningMsg += `Alto supera catálogo (${product.heights[product.heights.length - 1]} cm). `;
+                }
+
+                if (outOfBounds) {
+                    warningTitle.textContent = "Medida fuera de catálogo";
+                    warningText.textContent = warningMsg + "Se aplica tarifa máxima.";
+                    warningBox.classList.remove('hidden');
+                }
+
+                const price = product.getPrice(widthIdx, heightIdx, window.selectedColor);
+                window.activePrice = price;
+                window.activeMatchedSize = `${product.widths[widthIdx]} x ${product.heights[heightIdx]} cm`;
+
+                displayPrice.textContent = price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                displayMatched.textContent = window.activeMatchedSize;
+                displayLimit.textContent = `${product.widths[0]}x${product.heights[0]} hasta ${product.widths[product.widths.length-1]}x${product.heights[product.heights.length-1]} cm`;
+
+                highlightCell(widthIdx, heightIdx);
+
+            } else {
+                togglePriceBreakdown(false);
+                const categoryModels = DB_M2[window.currentCategory].modelos;
+                const activeModel = categoryModels.find(m => m.id === window.selectedProduct);
+                
+                if (!activeModel) return;
+                colorLabel.textContent = "Estándar";
+
+                let realArea = (anchoInput / 100) * (altoInput / 100);
+                let billingArea = realArea;
+                let isMinApplied = false;
+
+                if (billingArea < 1.0) {
+                    billingArea = 1.0;
+                    isMinApplied = true;
+                }
+
+                const finalPrice = billingArea * activeModel.m2;
+                window.activePrice = finalPrice;
+                window.activeMatchedSize = `${anchoInput} x ${altoInput} cm`;
+
+                displayPrice.textContent = finalPrice.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                displayM2Calc.textContent = `${realArea.toFixed(3)} m² ${isMinApplied ? '(Mínimo de 1.00 M² aplicado)' : ''}`;
+                displayLimit.textContent = `Tarifa por M²: ${activeModel.m2.toFixed(2)} €/m²`;
+
+                if (window.currentCategory === "persianas" && anchoInput > 160) {
+                    warningTitle.textContent = "Nota de confección";
+                    warningText.textContent = "Ancho máximo aconsejado: 1.60 m. Para anchos superiores se aconseja fabricar con un montante y dos bajadas.";
+                    warningBox.classList.remove('hidden');
+                } else if (isMinApplied) {
+                    warningTitle.textContent = "Mínimo de facturación";
+                    warningText.textContent = "Se aplica la tarifa de 1,00 M² por pieza.";
+                    warningBox.classList.remove('hidden');
+                }
+
+                updateAreaScalerVisual(anchoInput, altoInput, realArea, isMinApplied);
+            }
+        };
+
+        function togglePriceBreakdown(show) {
+            const wrapper = document.getElementById('price-breakdown-wrapper');
+            if (wrapper) {
+                if (show) wrapper.classList.remove('hidden');
+                else wrapper.classList.add('hidden');
+            }
+        }
+
+        function updatePriceBreakdownUI(desglose) {
+            togglePriceBreakdown(true);
+            
+            const marcoEl = document.getElementById('breakdown-marco');
+            const cristalEl = document.getElementById('breakdown-cristal');
+            const espejoEl = document.getElementById('breakdown-espejo');
+            const cantoEl = document.getElementById('breakdown-canto');
+            const traseraEl = document.getElementById('breakdown-trasera');
+            const grapasEl = document.getElementById('breakdown-grapas');
+            const plasticosEl = document.getElementById('breakdown-plasticos');
+
+            marcoEl.querySelector('span:last-child').textContent = `${desglose.baseMarco.toFixed(2)} €`;
+
+            if (desglose.cristal > 0) {
+                cristalEl.classList.remove('hidden');
+                cristalEl.querySelector('span:last-child').textContent = `${desglose.cristal.toFixed(2)} €`;
+            } else { cristalEl.classList.add('hidden'); }
+
+            if (desglose.espejo > 0) {
+                espejoEl.classList.remove('hidden');
+                espejoEl.querySelector('span:last-child').textContent = `${desglose.espejo.toFixed(2)} €`;
+            } else { espejoEl.classList.add('hidden'); }
+
+            if (desglose.canto > 0) {
+                cantoEl.classList.remove('hidden');
+                cantoEl.querySelector('span:last-child').textContent = `${desglose.canto.toFixed(2)} €`;
+            } else { cantoEl.classList.add('hidden'); }
+
+            if (desglose.trasera > 0) {
+                traseraEl.classList.remove('hidden');
+                traseraEl.querySelector('span:last-child').textContent = `${desglose.trasera.toFixed(2)} €`;
+            } else { traseraEl.classList.add('hidden'); }
+
+            if (desglose.grapas > 0) {
+                grapasEl.classList.remove('hidden');
+                grapasEl.querySelector('span:last-child').textContent = `${desglose.grapas.toFixed(2)} €`;
+            } else { grapasEl.classList.add('hidden'); }
+
+            if (desglose.plasticos > 0) {
+                plasticosEl.classList.remove('hidden');
+                plasticosEl.querySelector('span:last-child').textContent = `${desglose.plasticos.toFixed(2)} €`;
+            } else { plasticosEl.classList.add('hidden'); }
+        }
+
+        function renderMatrixTable() {
+            const table = document.getElementById('matrix-table');
+
+            if (window.currentCategory === "marcos") {
+                const molduraId = window.selectedProduct;
+                const molduraIndex = parseInt(molduraId.split('_')[1]) - 1;
+                document.getElementById('matrix-subtitle').textContent = `Moldura ${molduraIndex + 1} - Tarifas Completas por Acabado de Cristal`;
+
+                let html = `
+                    <thead>
+                        <tr class="bg-slate-100 border-b border-slate-200 text-slate-600">
+                            <th class="p-2.5 text-center border-r border-slate-200 font-bold bg-slate-100 sticky left-0 z-20 min-w-[80px]">Medida</th>
+                            <th class="p-2.5 text-center border-r border-slate-200 font-bold">Solo Marco</th>
+                            <th class="p-2.5 text-center border-r border-slate-200 font-bold bg-amber-50/50">C. Brillo</th>
+                            <th class="p-2.5 text-center border-r border-slate-200 font-bold bg-sky-50/50">C. Mate</th>
+                            <th class="p-2.5 text-center font-bold bg-rose-50/50">PP VS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+                MARCOS_STANDARD_DB.forEach((m, idx) => {
+                    const basePrice = m.prices[molduraIndex];
+                    html += `
+                        <tr id="marco-row-${idx}" class="border-b border-slate-100 hover:bg-rose-50/20 transition text-slate-700">
+                            <td class="p-2 font-bold text-center border-r border-slate-200 bg-slate-50 text-slate-600 sticky left-0 z-10" id="marco-header-${idx}">
+                                ${m.size}
+                            </td>
+                            <td id="marco-cell-${idx}-no" class="p-2 text-center border-r border-slate-200 font-mono">
+                                ${basePrice.toFixed(2)} €
+                            </td>
+                            <td id="marco-cell-${idx}-c_brillo" class="p-2 text-center border-r border-slate-200 font-mono bg-amber-50/20">
+                                ${(basePrice + m.brillo).toFixed(2)} €
+                            </td>
+                            <td id="marco-cell-${idx}-c_mate" class="p-2 text-center border-r border-slate-200 font-mono bg-sky-50/20">
+                                ${(basePrice + m.mate).toFixed(2)} €
+                            </td>
+                            <td id="marco-cell-${idx}-pp_vs" class="p-2 text-center font-mono bg-rose-50/20">
+                                ${(basePrice + m.ppvs).toFixed(2)} €
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += "</tbody>";
+                table.innerHTML = html;
+
+            } else {
+                const product = DB_TARIFAS[window.selectedProduct];
+                if (!product) return;
+
+                document.getElementById('matrix-subtitle').textContent = `Tabla PVP: ${product.nombre}`;
+
+                let html = "";
+                html += "<thead><tr class='bg-slate-100 border-b border-slate-200 text-slate-600'>";
+                html += "<th class='p-2 text-center border-r border-slate-200 font-bold bg-slate-100 sticky left-0 z-20 min-w-[70px]'>Alto\\Ancho</th>";
+                product.widths.forEach(w => {
+                    html += `<th class='p-2 text-center font-bold border-r border-slate-200 min-w-[55px]' id="col-header-${w}">${w} cm</th>`;
+                });
+                html += "</tr></thead>";
+
+                html += "<tbody>";
+                product.heights.forEach((h, hIdx) => {
+                    html += `<tr class='border-b border-slate-100 hover:bg-slate-50 transition' id="row-tr-${h}">`;
+                    html += `<td class='p-2 font-bold text-center border-r border-slate-200 bg-slate-50 text-slate-600 sticky left-0 z-10' id="row-header-${h}">${h} cm</td>`;
+                    
+                    product.widths.forEach((w, wIdx) => {
+                        const price = product.getPrice(wIdx, hIdx, window.selectedColor);
+                        html += `
+                            <td class='p-2 text-center border-r border-slate-200 text-slate-700 font-mono' id="cell-${hIdx}-${wIdx}">
+                                ${price.toFixed(2)}
+                            </td>`;
+                    });
+                    html += "</tr>";
+                });
+                html += "</tbody>";
+
+                table.innerHTML = html;
+            }
+        }
+
+        function highlightCell(colIndex, rowIndex) {
+            clearHighlights();
+
+            const cellId = `cell-${rowIndex}-${colIndex}`;
+            const cell = document.getElementById(cellId);
+            if (!cell) return;
+
+            cell.className = "p-2 text-center border-r border-emerald-300 bg-emerald-500 text-white font-extrabold shadow-inner transform scale-105 z-10 transition-all duration-150 animate-pulse font-mono";
+
+            const product = DB_TARIFAS[window.selectedProduct];
+            const wVal = product.widths[colIndex];
+            const hVal = product.heights[rowIndex];
+
+            const colHeader = document.getElementById(`col-header-${wVal}`);
+            const rowHeader = document.getElementById(`row-header-${hVal}`);
+            const rowTr = document.getElementById(`row-tr-${hVal}`);
+
+            if (colHeader) colHeader.className = "p-2 text-center font-black border-r border-emerald-300 bg-emerald-100 text-emerald-800 min-w-[55px]";
+            if (rowHeader) rowHeader.className = "p-2 font-black text-center border-r border-emerald-300 bg-emerald-100 text-emerald-800 sticky left-0 z-10";
+            if (rowTr) rowTr.classList.add("bg-emerald-50/20");
+
+            cell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        }
+
+        function highlightMarcoRow(idx, cristalId) {
+            clearHighlights();
+
+            const rowTr = document.getElementById(`marco-row-${idx}`);
+            const rowHeader = document.getElementById(`marco-header-${idx}`);
+            const targetCell = document.getElementById(`marco-cell-${idx}-${cristalId}`);
+
+            if (rowTr) rowTr.classList.add("bg-rose-50/80");
+            if (rowHeader) rowHeader.className = "p-2 font-black text-center border-r border-rose-300 bg-rose-100 text-rose-800 sticky left-0 z-10";
+            
+            if (targetCell) {
+                targetCell.className = "p-2 text-center border-r border-rose-300 bg-rose-600 text-white font-extrabold shadow-inner transform scale-[1.03] z-10 transition-all duration-150 animate-pulse font-mono";
+                targetCell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            }
+        }
+
+        function clearHighlights() {
+            const table = document.getElementById('matrix-table');
+            if (!table) return;
+
+            const tds = table.querySelectorAll('td');
+            tds.forEach(td => {
+                if (td.id.startsWith('cell-')) {
+                    td.className = "p-2 text-center border-r border-slate-200 text-slate-700 font-mono";
+                } else if (td.id.startsWith('row-header-')) {
+                    td.className = "p-2 font-bold text-center border-r border-slate-200 bg-slate-50 text-slate-600 sticky left-0 z-10";
+                } else if (td.id.startsWith('marco-cell-')) {
+                    const parts = td.id.split('-');
+                    const cristalId = parts[3]; 
+                    if (cristalId === 'no') {
+                        td.className = "p-2 text-center border-r border-slate-200 font-mono";
+                    } else if (cristalId === 'c_brillo') {
+                        td.className = "p-2 text-center border-r border-slate-200 font-mono bg-amber-50/20";
+                    } else if (cristalId === 'c_mate') {
+                        td.className = "p-2 text-center border-r border-slate-200 font-mono bg-sky-50/20";
+                    } else if (cristalId === 'pp_vs') {
+                        td.className = "p-2 text-center font-mono bg-rose-50/20";
+                    }
+                } else if (td.id.startsWith('marco-header-')) {
+                    td.className = "p-2 font-bold text-center border-r border-slate-200 bg-slate-50 text-slate-600 sticky left-0 z-10";
+                }
+            });
+
+            const ths = table.querySelectorAll('th');
+            ths.forEach(th => {
+                if (th.id && th.id.startsWith('col-header-')) {
+                    th.className = "p-2 text-center font-bold border-r border-slate-200 min-w-[55px]";
+                }
+            });
+
+            const trs = table.querySelectorAll('tr');
+            trs.forEach(tr => {
+                tr.classList.remove("bg-emerald-50/20", "bg-rose-50/80");
+            });
+        }
+
+        // --- GESTIÓN DEL PRESUPUESTO GLOBAL ---
+        window.addToQuote = function() {
+            const anchoInput = parseFloat(document.getElementById('input-ancho').value);
+            const altoInput = parseFloat(document.getElementById('input-alto').value);
+            const tagInput = document.getElementById('input-tag').value.trim() || `${CATEGORIAS[window.currentCategory].nombre} ${window.budgets[window.currentCategory].length + 1}`;
+
+            if (window.activePrice === 0 || isNaN(anchoInput) || isNaN(altoInput)) {
+                showToast("Por favor, introduzca medidas válidas antes de añadir al presupuesto.", false);
+                return;
+            }
+
+            let pName = "";
+            let cName = "";
+
+            if (window.currentCategory === "marcos") {
+                const molduraId = window.selectedProduct;
+                const molduraNum = molduraId.split('_')[1];
+                pName = `Moldura ${molduraNum}`;
+                
+                const cristalSelected = document.getElementById('select-cristal').value;
+                const cristalLabels = {
+                    no: "Solo Marco",
+                    c_brillo: "C. Brillo",
+                    c_mate: "C. Mate",
+                    pp_vs: "PP VS"
+                };
+                
+                let extras = [];
+                extras.push(cristalLabels[cristalSelected]);
+
+                if (window.activeConsumibles.espejoId !== "ninguno") {
+                    const esp = DB_CONSUMIBLES[window.activeConsumibles.espejoId];
+                    extras.push(`Espejo: ${esp.nombre}`);
+                    if (window.activeConsumibles.cantoPulido === "si") {
+                        extras.push("Canto Pulido");
+                    }
+                }
+                if (window.activeConsumibles.traseraId !== "ninguno") {
+                    const tr = DB_CONSUMIBLES[window.activeConsumibles.traseraId];
+                    extras.push(`Trasera: ${tr.nombre}`);
+                }
+                if (window.activeConsumibles.grapasGrandes > 0) extras.push(`${window.activeConsumibles.grapasGrandes} Grapas G.`);
+                if (window.activeConsumibles.grapasPequenas > 0) extras.push(`${window.activeConsumibles.grapasPequenas} Grapas P.`);
+                if (window.activeConsumibles.plasticosId !== "ninguno") {
+                    const pl = DB_CONSUMIBLES[window.activeConsumibles.plasticosId];
+                    extras.push(pl.nombre);
+                }
+
+                cName = extras.join(', ');
+
+            } else if (CATEGORIAS[window.currentCategory].tipoCalculo === "matricial") {
+                const product = DB_TARIFAS[window.selectedProduct];
+                pName = product.nombre;
+                const colorObj = product.colores.find(c => c.id === window.selectedColor);
+                cName = colorObj ? colorObj.nombre : "Estándar";
+            } else {
+                const activeModel = DB_M2[window.currentCategory].modelos.find(m => m.id === window.selectedProduct);
+                pName = activeModel.nombre;
+                cName = "Estándar";
+            }
+
+            const item = {
+                id: Date.now(),
+                categoryLabel: CATEGORIAS[window.currentCategory].nombre,
+                tag: tagInput,
+                productName: pName,
+                colorName: cName,
+                anchoReal: anchoInput,
+                altoReal: altoInput,
+                matchedSize: window.activeMatchedSize,
+                price: window.activePrice
+            };
+
+            window.budgets[window.currentCategory].push(item);
+            
+            // Sincronizar de forma segura con Firebase Cloud
+            if (window.uploadBudgetsToCloud) {
+                window.uploadBudgetsToCloud();
+            }
+            
+            renderBudget();
+            updateBadgeCounts();
+
+            document.getElementById('input-tag').value = ""; 
+            if (window.currentCategory === "marcos") {
+                resetConsumiblesForm();
+                calculatePrice();
+            }
+
+            showToast(`"${tagInput}" añadida al presupuesto de ${CATEGORIAS[window.currentCategory].nombre}.`, true);
+        };
+
+        window.removeQuoteItem = function(id) {
+            window.budgets[window.currentCategory] = window.budgets[window.currentCategory].filter(item => item.id !== id);
+            
+            if (window.uploadBudgetsToCloud) {
+                window.uploadBudgetsToCloud();
+            }
+
+            renderBudget();
+            updateBadgeCounts();
+            showToast("Elemento eliminado.", true);
+        };
+
+        window.clearQuote = function() {
+            const list = window.budgets[window.currentCategory];
+            if (!list || list.length === 0) return;
+            window.budgets[window.currentCategory] = [];
+            
+            if (window.uploadBudgetsToCloud) {
+                window.uploadBudgetsToCloud();
+            }
+
+            renderBudget();
+            updateBadgeCounts();
+            showToast(`Presupuesto de ${CATEGORIAS[window.currentCategory].nombre} vaciado.`, true);
+        };
+
+        window.updateBadgeCounts = function() {
+            const categories = ['mosquiteras', 'cortinas', 'persianas', 'marcos', 'alfombras'];
+            categories.forEach(catId => {
+                const count = window.budgets[catId] ? window.budgets[catId].length : 0;
+                const badge = document.getElementById(`badge-count-${catId}`);
+                if (badge) {
+                    if (count > 0) {
+                        badge.textContent = count;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            });
+        };
+
+        window.renderBudget = function() {
+            const listContainer = document.getElementById('quote-list');
+            const totalDisplay = document.getElementById('display-total-quote');
+            const currentList = window.budgets[window.currentCategory] || [];
+
+            if (currentList.length === 0) {
+                listContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-6">No hay elementos en esta categoría.</p>`;
+                totalDisplay.textContent = "0,00";
+                return;
+            }
+
+            let html = "";
+            let total = 0;
+
+            currentList.forEach(item => {
+                total += item.price;
+                html += `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs hover:border-slate-300 transition gap-2">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-slate-200 text-slate-700 mr-1.5 align-middle">${item.categoryLabel}</span>
+                                    <span class="font-bold text-slate-900 align-middle truncate">${item.tag}</span>
+                                </div>
+                                <span class="font-extrabold text-emerald-700 font-mono text-sm">${item.price.toFixed(2)} €</span>
+                            </div>
+                            <div class="text-slate-500 text-[11px] mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
+                                <span><strong>Modelo:</strong> ${item.productName}</span>
+                                <span>•</span>
+                                <span class="text-rose-600 font-medium"><strong>Extras:</strong> ${item.colorName}</span>
+                                <span>•</span>
+                                <span><strong>Medida:</strong> ${item.anchoReal}x${item.altoReal}cm</span>
+                            </div>
+                        </div>
+                        <button onclick="removeQuoteItem(${item.id})" class="text-slate-400 hover:text-red-500 transition p-1 rounded-lg shrink-0 cursor-pointer">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = html;
+            totalDisplay.textContent = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            safeCreateIcons();
+        };
+
+        // --- IMPRESIÓN ---
+        window.printQuote = function() {
+            const currentList = window.budgets[window.currentCategory] || [];
+
+            if (currentList.length === 0) {
+                showToast(`Por favor, añada algún elemento para poder generar la impresión.`, false);
+                return;
+            }
+
+            const printRows = document.getElementById('print-table-rows');
+            let html = "";
+            let totalNeto = 0;
+
+            currentList.forEach(item => {
+                totalNeto += item.price;
+                html += `
+                    <tr class="border-b border-slate-200">
+                        <td class="p-2 font-semibold">${item.tag}</td>
+                        <td class="p-2 uppercase font-black text-slate-500 text-[10px]">${item.categoryLabel}</td>
+                        <td class="p-2">${item.productName}</td>
+                        <td class="p-2 text-rose-700 font-medium">${item.colorName}</td>
+                        <td class="p-2 text-center">${item.anchoReal} x ${item.altoReal} cm</td>
+                        <td class="p-2 text-center font-mono text-slate-600">${item.matchedSize}</td>
+                        <td class="p-2 text-right font-bold font-mono">${item.price.toFixed(2)} €</td>
+                    </tr>
+                `;
+            });
+
+            const tax = totalNeto * 0.21;
+            const totalWithTax = totalNeto + tax;
+
+            printRows.innerHTML = html;
+            document.getElementById('print-header-title').textContent = `PRESUPUESTO DE ${CATEGORIAS[window.currentCategory].nombre.toUpperCase()}`;
+            document.getElementById('print-subtotal').textContent = `${totalNeto.toFixed(2)} €`;
+            document.getElementById('print-tax').textContent = `${tax.toFixed(2)} €`;
+            document.getElementById('print-total').textContent = `${totalWithTax.toFixed(2)} €`;
+
+            window.print();
+        };
+
+        // --- TOASTS NOTIFICATION ---
+        window.showToast = function(message, isSuccess) {
+            const oldToast = document.getElementById('custom-toast');
+            if (oldToast) oldToast.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'custom-toast';
+            toast.className = `fixed bottom-6 right-6 z-50 p-4 rounded-xl shadow-lg border text-xs max-w-sm flex items-center gap-2.5 transition-all duration-300 transform translate-y-2 opacity-0
+                ${isSuccess ? 'bg-emerald-50 text-emerald-950 border-emerald-200' : 'bg-rose-50 text-rose-950 border-rose-200'}`;
+            
+            const iconName = isSuccess ? 'check-circle' : 'alert-octagon';
+            toast.innerHTML = `
+                <i data-lucide="${iconName}" class="${isSuccess ? 'text-emerald-600' : 'text-rose-600'} w-4 h-4 shrink-0"></i>
+                <div class="flex-1 font-medium">${message}</div>
+            `;
+
+            document.body.appendChild(toast);
+            safeCreateIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.add('translate-y-2', 'opacity-0');
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 4000);
+        };
+    </script>
+</body>
+</html>
