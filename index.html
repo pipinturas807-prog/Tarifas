@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multitarificador Pinturas 807 - Control de Ventas</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Estilos de impresión profesionales para presupuestos */
+        @media print {
+            body { background: white; color: black; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-12">
+
+    <!-- Navbar Principal (no-print) -->
+    <header class="bg-slate-900 text-white shadow-md no-print sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goToHome()">
+                <div class="p-2 bg-emerald-600 rounded-lg">
+                    <i data-lucide="layout-grid" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight flex items-center gap-2">
+                        PINTURAS 807 <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-mono">PVP JUNIO 2026</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Tarificadores Individuales por Categoría</p>
+                </div>
+            </div>
+            
+            <!-- Barra de navegación por categorías -->
+            <nav class="flex flex-wrap items-center gap-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700/60 text-xs font-semibold">
+                <button onclick="goToHome()" id="nav-home" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="home" class="w-3.5 h-3.5"></i> Inicio
+                </button>
+                <button onclick="switchCategory('mosquiteras')" id="nav-mosquiteras" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="calculator" class="w-3.5 h-3.5"></i> Mosquiteras
+                </button>
+                <button onclick="switchCategory('cortinas')" id="nav-cortinas" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="door-open" class="w-3.5 h-3.5"></i> Cortinas
+                </button>
+                <button onclick="switchCategory('persianas')" id="nav-persianas" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="chevrons-down" class="w-3.5 h-3.5"></i> Persianas
+                </button>
+                <button onclick="switchCategory('estores')" id="nav-estores" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="unfold-vertical" class="w-3.5 h-3.5"></i> Estores de Madera
+                </button>
+                <button onclick="switchCategory('marcos')" id="nav-marcos" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="frame" class="w-3.5 h-3.5"></i> Marcos y Consumibles
+                </button>
+                <button onclick="switchCategory('alfombras')" id="nav-alfombras" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="layers" class="w-3.5 h-3.5"></i> Alfombras
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- PANTALLA 1: DASHBOARD / PANTALLA PRINCIPAL (no-print) -->
+    <section id="panel-home" class="max-w-7xl mx-auto px-4 py-12 no-print animate-fade-in">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <h2 class="text-4xl font-black text-slate-900 tracking-tight">Portal de Ventas & Tarifas 2026</h2>
+            <p class="text-slate-500 mt-2 text-sm">Selecciona una categoría de producto. Cada sección cuenta con su propio tarificador y presupuesto independiente.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Tarjeta: Mosquiteras -->
+            <div onclick="switchCategory('mosquiteras')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="calculator" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Mosquiteras</h3>
+                    <p class="text-xs text-slate-500 mt-1.5">Tarifa PVP Oficial Junio 2026 de Pinturas 807. Incluye modelos Enrollable Vertical, Lateral, Corredera Curva, Fija y Puerta Practicable.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600">
+                    <span>Acceder al tarificador</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Cortinas de puerta -->
+            <div onclick="switchCategory('cortinas')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-5 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="door-open" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Cortinas de puerta</h3>
+                    <p class="text-xs text-slate-500 mt-1.5">Confección a medida por M². Canutillo, Cadenas de Aluminio, Cintas de Plástico y series decorativas de Pinturas 807. Tarifa Junio 2026 (Importe exacto sin mínimos).</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-indigo-600">
+                    <span>Acceder al tarificador</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Persianas -->
+            <div onclick="switchCategory('persianas')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-amber-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-5 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="chevrons-down" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Persianas Alicantinas</h3>
+                    <p class="text-xs text-slate-500 mt-1.5">Confección a medida por M² de persianas alicantinas en plástico y madera natural, barnizada o pintada. Tarifa Junio 2026 (Importe exacto sin mínimos).</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-600">
+                    <span>Acceder al tarificador</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Estores de Madera -->
+            <div onclick="switchCategory('estores')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-teal-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center mb-5 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="unfold-vertical" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Estores de Madera</h3>
+                    <p class="text-xs text-slate-500 mt-1.5">Confección a medida por M². Series 3606, 3643, 362, 3646 y 3692. Tarifa oficial de Pinturas 807 Junio 2026 con avisos estructurales de anchura máxima.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-teal-600">
+                    <span>Acceder al tarificador</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Marcos y Consumibles -->
+            <div onclick="switchCategory('marcos')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-rose-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-5 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="frame" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Marcos (1 al 14) y Consumibles</h3>
+                    <p class="text-xs text-slate-500 mt-1.5">Tarifa matricial de molduras 1 a 14, cristales, espejos, canto pulido lineal, traseras DM, grapas, Arraglass y Arrasol.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-rose-600">
+                    <span id="label-marcos-status">Acceder al tarificador</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Alfombras -->
+            <div onclick="switchCategory('alfombras')" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-cyan-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center mb-5 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-300">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Alfombras</h3>
+                    <p class="text-xs text-slate-500 mt-1.5">Precios por metro cuadrado, alfombrados a medida y felpudos metálicos o textiles.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-cyan-600">
+                    <span id="label-alfombras-status">Esperando tus tarifas...</span>
+                    <i data-lucide="clock" class="w-4 h-4"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Firma de autor profesional discreta -->
+        <div class="mt-16 border-t border-slate-200 pt-6 text-center">
+            <p class="text-xs text-slate-400 font-medium tracking-wide">
+                Desarrollado con fines profesionales por <span class="text-slate-500 font-bold">Oriol</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- PANTALLA 2: ENTORNO DEL TARIFICADOR ACTIVO (no-print) -->
+    <section id="panel-tarificador" class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 no-print hidden">
+        
+        <!-- COLUMNA IZQUIERDA: CONTROLES DEL BUSCADOR (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Volver al menú de inicio -->
+            <button onclick="goToHome()" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-4 py-2.5 rounded-xl shadow-sm self-start transition cursor-pointer">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Menú Principal
+            </button>
+
+            <!-- Tarjeta del buscador dinámico -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-2 mb-4">
+                    <div id="category-badge-icon" class="p-1.5 rounded-lg text-white bg-slate-800">
+                        <!-- Icono variable -->
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Tarificando</span>
+                        <h2 id="category-active-title" class="text-lg font-black text-slate-900 leading-tight">-</h2>
+                    </div>
+                </div>
+
+                <!-- CONTENEDOR DE CAMPOS -->
+                <div id="calculator-fields" class="space-y-4">
+                    <!-- Tipo de modelo -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Modelo / Tipo</label>
+                        <select id="select-tipo" onchange="onProductChange()" class="w-full rounded-xl border border-slate-300 px-3.5 py-3 bg-white shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-slate-800 font-medium cursor-pointer">
+                            <!-- Opciones cargadas por JS -->
+                        </select>
+                    </div>
+
+                    <!-- Tipo de Cristal (Solo visible para Marcos) -->
+                    <div id="cristal-selection-wrapper" class="hidden">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">¿Lleva Cristal?</label>
+                        <select id="select-cristal" onchange="onCristalChange()" class="w-full rounded-xl border border-rose-300 px-3.5 py-3 bg-rose-50/50 shadow-sm focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-slate-800 font-semibold cursor-pointer">
+                            <option value="no" selected>No (Solo Marco)</option>
+                            <option value="c_brillo">C.Brillo (Cristal Brillo)</option>
+                            <option value="c_mate">C.Mate (Cristal Mate)</option>
+                            <option value="pp_vs">PP VS</option>
+                        </select>
+                    </div>
+
+                    <!-- SECCIÓN DE CONSUMIBLES (FOTO DE LA HOJA) - Solo visible para Marcos -->
+                    <div id="consumibles-wrapper" class="hidden border-t border-slate-100 pt-4 space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-rose-600 flex items-center gap-1.5 mb-2">
+                            <i data-lucide="package" class="w-4 h-4"></i> Consumibles Adicionales
+                        </h3>
+
+                        <!-- Espejos al corte -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Espejo (M²)</label>
+                            <select id="select-espejo" onchange="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-2 bg-white text-xs font-medium cursor-pointer">
+                                <option value="ninguno" selected>Ninguno (Sin espejo)</option>
+                                <option value="espejo_3_2">Espejo 3 mm (69,98 €/M²)</option>
+                                <option value="espejo_4_2">Espejo 4 mm (85,27 €/M²)</option>
+                            </select>
+                        </div>
+
+                        <!-- Canto Pulido (Solo habilitado si se selecciona Espejo) -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1 flex justify-between items-center">
+                                <span>Canto Pulido (Metros Lineales)</span>
+                                <span class="text-[10px] text-slate-400 font-normal">Sujeto a redondeo x10 cm</span>
+                            </label>
+                            <select id="select-canto-pulido" onchange="onConsumibleChange()" disabled class="w-full rounded-xl border border-slate-200 px-3 py-2 bg-slate-50 text-xs font-medium cursor-pointer disabled:opacity-50 disabled:bg-slate-100 disabled:text-slate-400">
+                                <option value="no" selected>No aplicar (0,00 €)</option>
+                                <option value="si">Canto Pulido (+8,13 €/m.l.)</option>
+                            </select>
+                        </div>
+
+                        <!-- Traseras DM -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Traseras DM (M²)</label>
+                            <select id="select-trasera-dm" onchange="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-2 bg-white text-xs font-medium cursor-pointer">
+                                <option value="ninguno" selected>Ninguna (Sin trasera)</option>
+                                <option value="dm_2_5">Trasera DM 2.5 mm grueso (10,05 €/M²)</option>
+                                <option value="dm_4">Trasera DM 4.0 mm grueso (19,66 €/M²)</option>
+                            </select>
+                        </div>
+
+                        <!-- Grapas Enmarcación -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Grapas de Enmarcación</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <span class="block text-[10px] text-slate-400 mb-0.5">Grandes (0,78 €/u.)</span>
+                                    <input type="number" id="input-grapas-grandes" min="0" value="0" oninput="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs text-center font-bold">
+                                </div>
+                                <div>
+                                    <span class="block text-[10px] text-slate-400 mb-0.5">Pequeñas (0,45 €/u.)</span>
+                                    <input type="number" id="input-grapas-pequenas" min="0" value="0" oninput="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs text-center font-bold">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Plásticos protectores: Arraglass y Arrasol -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Plásticos Protectores Especiales (M²)</label>
+                            <select id="select-plasticos" onchange="onConsumibleChange()" class="w-full rounded-xl border border-slate-300 px-3 py-2 bg-white text-xs font-medium cursor-pointer">
+                                <option value="ninguno" selected>Ninguno</option>
+                                <option value="arraglass">PS ARRAGLASS 1.5 MM (Mate/Brillo) (49,15 €/M²)</option>
+                                <option value="arrasol">ARRASOL 2 MM (Brillo/Brillo) (64,78 €/M²)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Acabados -->
+                    <div id="color-selection-wrapper">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" id="label-color-title">Color / Acabado</label>
+                        <div class="grid grid-cols-3 gap-2" id="color-swatches">
+                            <!-- Swatches interactivos -->
+                        </div>
+                    </div>
+
+                    <!-- Dimensiones -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Medidas Reales del Cliente</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <span class="block text-xs text-slate-400 mb-1">Ancho real (cm)</span>
+                                <div class="relative">
+                                    <input type="number" id="input-ancho" placeholder="Ej. 18" step="0.1" oninput="calculatePrice()" class="w-full rounded-xl border border-slate-300 pl-4 pr-10 py-3 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-semibold text-lg">
+                                    <span class="absolute right-3.5 top-3.5 text-sm font-bold text-slate-400">cm</span>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-400 mb-1">Alto real (cm)</span>
+                                <div class="relative">
+                                    <input type="number" id="input-alto" placeholder="Ej. 24" step="0.1" oninput="calculatePrice()" class="w-full rounded-xl border border-slate-300 pl-4 pr-10 py-3 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-semibold text-lg">
+                                    <span class="absolute right-3.5 top-3.5 text-sm font-bold text-slate-400">cm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISTA PREVIA PARA CATEGORÍAS SIN TARIFAS CARGADAS AÚN -->
+                <div id="calculator-placeholder" class="hidden py-8 text-center space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+                        <i data-lucide="image" class="w-8 h-8"></i>
+                    </div>
+                    <div class="max-w-xs mx-auto">
+                        <h4 class="font-bold text-slate-800 text-sm">Tarifas pendientes de configurar</h4>
+                        <p class="text-xs text-slate-400 mt-1">Envíame las fotos o documentos de las tarifas de esta sección y las integraré exactamente igual que las demás.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Resultado de Precio -->
+            <div id="price-result-card" class="bg-slate-900 text-white rounded-2xl p-6 shadow-md relative overflow-hidden border border-slate-800">
+                <div class="absolute -right-8 -bottom-8 opacity-5 text-emerald-400 pointer-events-none">
+                    <i data-lucide="euro" class="w-48 h-48"></i>
+                </div>
+
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Precio PVP Sugerido</h3>
+                        <p class="text-slate-400 text-xs mt-0.5">I.V.A. Incluido</p>
+                    </div>
+                    <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full font-semibold" id="label-color-selected">-</span>
+                </div>
+
+                <div class="flex items-baseline gap-1 my-4 relative z-10">
+                    <span id="display-price" class="text-5xl font-black tracking-tight text-white font-mono">0,00</span>
+                    <span class="text-2xl font-bold text-emerald-400">€</span>
+                </div>
+
+                <!-- Desglose de Precios -->
+                <div id="price-breakdown-wrapper" class="hidden border-t border-slate-800 py-3 space-y-1.5 text-[11px] text-slate-400 relative z-10">
+                    <div class="font-bold text-slate-300 text-xs uppercase tracking-wider pb-1">Desglose de cálculo:</div>
+                    <div class="flex justify-between" id="breakdown-marco">
+                        <span>Marco base:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-cristal">
+                        <span>Cristal seleccionado:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-espejo">
+                        <span>Espejo:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-canto">
+                        <span>Canto Pulido:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-trasera">
+                        <span>Trasera DM:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-grapas">
+                        <span>Grapas de enmarcación:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between hidden" id="breakdown-plasticos">
+                        <span>Plásticos protectores:</span>
+                        <span class="font-mono text-white">0,00 €</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-800 pt-4 space-y-2 text-xs text-slate-300 relative z-10">
+                    <div class="flex justify-between" id="matched-size-row">
+                        <span>Medida estándar sugerida:</span>
+                        <span id="display-matched-size" class="font-bold text-white">-</span>
+                    </div>
+                    <div class="flex justify-between" id="m2-calculated-row">
+                        <span>Metros Cuadrados:</span>
+                        <span id="display-m2-calc" class="font-bold text-emerald-400">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Rango / Límites:</span>
+                        <span id="display-limit" class="font-medium">-</span>
+                    </div>
+                </div>
+
+                <!-- Añadir al Presupuesto -->
+                <div class="mt-5 pt-4 border-t border-slate-800 relative z-10">
+                    <div class="flex gap-2">
+                        <input type="text" id="input-tag" placeholder="Ubicación (ej. Ventana Salón)" class="flex-1 rounded-xl bg-slate-800 border border-slate-700 px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                        <button type="button" onclick="addToQuote()" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer relative z-20">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Añadir
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerta/Advertencia de medidas -->
+            <div id="calculator-warning" class="bg-amber-50 border border-amber-200 text-amber-950 p-4 rounded-xl text-xs hidden flex gap-3 items-start">
+                <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 text-amber-600"></i>
+                <div>
+                    <span class="font-bold block" id="warning-title">Medida fuera de rango estándar</span>
+                    <span id="warning-text"></span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA: TABLA MATRICIAL Y PANEL DE CONTROL DEL PRESUPUESTO (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+            
+            <!-- Visor de Matriz Activa / Lista M2 -->
+            <div id="panel-matrix-container" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="p-5 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <h3 class="font-extrabold text-slate-900 text-md flex items-center gap-1.5">
+                            <i data-lucide="grid" class="text-emerald-600 w-5 h-5" id="panel-matrix-icon"></i>
+                            <span id="panel-matrix-title-text">Matriz de Tarifas Activa</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5" id="matrix-subtitle">Visualización de la cuadrícula real del catálogo</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full uppercase tracking-wider" id="panel-matrix-dimension-label">
+                        Ancho x Alto (cm)
+                    </span>
+                </div>
+
+                <!-- Tabla Responsive Matricial -->
+                <div class="overflow-auto max-h-[420px] bg-white text-[11px]" id="table-standard-wrapper">
+                    <table class="w-full text-left border-collapse" id="matrix-table">
+                        <!-- Renderizado dinámico -->
+                    </table>
+                </div>
+
+                <!-- Contenedor Alternativo para M2 con Previsualizador de Área -->
+                <div class="p-6 hidden grid grid-cols-1 md:grid-cols-2 gap-6 bg-white" id="m2-alternative-wrapper">
+                    <!-- Tabla de tarifas por m2 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                                    <th class="p-3">Modelo / Serie</th>
+                                    <th class="p-3 text-right">Precio Neto/M²</th>
+                                </tr>
+                            </thead>
+                            <tbody id="m2-rates-tbody">
+                                <!-- Cargado dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Representación Gráfica Escala de Dimensiones -->
+                    <div class="bg-slate-50 rounded-xl border border-slate-200 p-4 flex flex-col justify-between items-center min-h-[220px]">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Proporción a Escala</span>
+                        
+                        <!-- Caja de dibujo representativo -->
+                        <div class="w-full flex-1 flex items-center justify-center p-2">
+                            <div id="visual-scaled-box" class="bg-indigo-100 border-2 border-indigo-400 rounded-lg flex items-center justify-center text-indigo-900 font-bold text-xs shadow-inner transition-all duration-300 relative" style="width: 140px; height: 160px;">
+                                <span id="visual-scaled-txt">0.00 m²</span>
+                                <span class="absolute -left-1 transform -translate-x-full text-[9px] text-slate-400 font-mono" id="visual-scaled-h">0cm</span>
+                                <span class="absolute -bottom-1 transform translate-y-full text-[9px] text-slate-400 font-mono" id="visual-scaled-w">0cm</span>
+                            </div>
+                        </div>
+
+                        <div class="text-[10px] text-slate-500 italic text-center mt-2">
+                            * Cálculo basado en el importe exacto según los metros cuadrados reales de la pieza.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bloque de Presupuesto / Carrito Acumulado (Por Categoría) -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-1.5">
+                        <i data-lucide="shopping-bag" class="text-emerald-600 w-5 h-5"></i>
+                        <span id="budget-category-title">Presupuesto Acumulado</span>
+                    </h3>
+                    <button onclick="clearQuote()" class="text-slate-400 hover:text-red-500 transition text-xs flex items-center gap-1 cursor-pointer">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        Limpiar sección
+                    </button>
+                </div>
+
+                <!-- Lista de productos añadidos de esta categoría -->
+                <div id="quote-list" class="space-y-2 max-h-[220px] overflow-y-auto mb-4 pr-1">
+                    <p class="text-xs text-slate-400 italic text-center py-6">No hay elementos añadidos en esta categoría.</p>
+                </div>
+
+                <!-- Total acumulado -->
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="text-center sm:text-left">
+                        <span class="text-xs text-slate-500 block uppercase font-bold tracking-wider" id="budget-sum-label">Total de esta sección</span>
+                        <div class="flex items-baseline justify-center sm:justify-start gap-1">
+                            <span id="display-total-quote" class="text-2xl font-black text-slate-950">0,00</span>
+                            <span class="text-lg font-bold text-slate-600">€</span>
+                        </div>
+                    </div>
+                    <button onclick="printQuote()" class="w-full sm:w-auto px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        Imprimir / Guardar PDF
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- VISTA EXCLUSIVA PARA IMPRESIÓN (Invisible fuera de la impresión) -->
+    <div class="hidden print-only p-8 bg-white text-black text-sm">
+        <div class="flex justify-between items-start border-b-2 border-slate-300 pb-6 mb-8">
+            <div>
+                <h1 class="text-2xl font-black tracking-tight uppercase" id="print-header-title">PRESUPUESTO</h1>
+                <p class="text-xs text-slate-500 mt-1">Generado en base a Tarifa Oficial Pinturas 807 - Junio 2026</p>
+            </div>
+            <div class="text-right">
+                <p class="font-bold">Fecha: <span id="print-date">-</span></p>
+                <p class="text-xs text-slate-500">Validez del presupuesto: 30 días</p>
+            </div>
+        </div>
+
+        <!-- Tabla de impresión -->
+        <table class="w-full text-left border-collapse mb-8 text-xs">
+            <thead>
+                <tr class="border-b border-slate-300 bg-slate-100">
+                    <th class="p-2 font-bold">Descripción / Ubicación</th>
+                    <th class="p-2 font-bold">Categoría</th>
+                    <th class="p-2 font-bold">Modelo</th>
+                    <th class="p-2 font-bold">Selección / Extras de Consumibles</th>
+                    <th class="p-2 font-bold text-center">Medidas Reales</th>
+                    <th class="p-2 font-bold text-center">Medida Tarificada</th>
+                    <th class="p-2 font-bold text-right">Precio total</th>
+                </tr>
+            </thead>
+            <tbody id="print-table-rows">
+                <!-- Dinámico -->
+            </tbody>
+        </table>
+
+        <!-- Totales Impresión simplificados (Precios finales ya incluyen IVA) -->
+        <div class="flex justify-end">
+            <div class="w-64 space-y-2 border-t border-slate-300 pt-4 text-xs">
+                <div class="flex justify-between border-t-2 border-black pt-2 text-sm font-black">
+                    <span>Total (I.V.A. Incluido):</span>
+                    <span id="print-total" class="text-emerald-700">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie de página de impresión con firma -->
+        <div class="mt-20 border-t border-slate-200 pt-6 text-[10px] text-slate-400 flex justify-between items-center">
+            <span>Este presupuesto es meramente informativo y está basado en tarifas estándares de venta recomendadas de Pinturas 807.</span>
+            <span class="font-medium italic">Creado por Oriol</span>
+        </div>
+    </div>
+
+    <!-- Script de lógica y base de datos completa -->
+    <script>
+        // --- 1. BASE DE DATOS TARIFARIA COMPLETA DE PINTURAS 807 PVP JUNIO 2026 ---
+        const DB_TARIFAS = {
+            // MOSQUITERA ENROLLABLE VERTICAL
+            enrollable_vert: {
+                nombre: "Mosquitera Enrollable Vertical",
+                widths: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                heights: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "plata_gris_bronce", nombre: "Plata, Gris 7016 y Bronce" },
+                    { id: "madera", nombre: "Efecto Madera (Golden Oak / Walnut)" }
+                ],
+                prices_blanco: [
+                    [59.54, 62.46, 65.57, 68.63, 71.72, 74.94, 80.44, 85.91, 91.33, 96.77, 102.27, 107.72, 113.21, 118.63, 123.99, 129.71, 135.35, 141.16, 146.94, 152.89], // h=50
+                    [61.05, 63.97, 67.09, 70.26, 73.37, 76.51, 82.01, 87.54, 93.04, 98.57, 104.07, 109.57, 115.07, 120.59, 126.09, 131.82, 137.26, 143.07, 148.85, 154.80], // h=60
+                    [64.53, 61.84, 70.57, 73.74, 76.85, 79.99, 85.52, 91.02, 96.52, 102.02, 107.55, 113.02, 118.49, 124.05, 129.57, 135.10, 140.74, 146.55, 152.33, 158.28], // h=70
+                    [67.98, 70.90, 74.02, 77.19, 80.30, 83.45, 88.94, 94.47, 99.97, 105.47, 111.00, 116.50, 122.00, 127.50, 133.02, 138.52, 144.19, 150.00, 155.78, 161.73], // h=80
+                    [71.44, 74.35, 77.47, 80.64, 83.75, 86.90, 92.40, 97.92, 103.42, 108.92, 114.45, 119.98, 125.48, 130.98, 136.49, 141.89, 147.56, 153.34, 159.15, 165.09], // h=90
+                    [74.89, 77.81, 80.92, 84.09, 87.20, 90.35, 95.85, 101.35, 106.87, 112.37, 117.90, 123.40, 128.93, 134.43, 139.95, 145.45, 151.12, 156.93, 162.71, 168.66], // h=100
+                    [78.34, 81.26, 84.37, 87.54, 90.66, 93.80, 99.30, 104.80, 110.32, 115.82, 121.35, 126.85, 132.38, 137.88, 143.41, 148.90, 154.57, 160.38, 166.16, 172.11], // h=110
+                    [81.82, 84.74, 87.85, 91.02, 94.14, 97.28, 102.78, 108.28, 113.80, 119.30, 124.83, 130.33, 135.83, 141.33, 146.86, 152.36, 158.02, 163.80, 169.61, 175.56], // h=120
+                    [85.27, 88.19, 91.30, 94.47, 97.59, 100.73, 106.23, 111.73, 117.26, 122.75, 128.28, 133.78, 139.31, 144.81, 150.34, 155.84, 161.50, 167.31, 173.09, 179.04], // h=130
+                    [88.75, 91.67, 94.78, 97.95, 101.07, 104.21, 109.71, 115.21, 120.73, 126.23, 131.76, 137.26, 142.76, 148.26, 153.79, 159.29, 164.95, 170.73, 176.54, 182.49], // h=140
+                    [92.20, 95.12, 98.23, 101.40, 104.52, 107.66, 113.16, 118.66, 124.19, 129.68, 135.21, 140.71, 146.21, 151.71, 157.24, 162.74, 168.41, 174.19, 179.99, 185.94], // h=150
+                    [95.65, 98.57, 101.68, 104.85, 107.97, 111.11, 116.61, 122.11, 127.61, 133.14, 138.66, 144.16, 149.66, 155.16, 160.69, 166.19, 171.86, 177.64, 183.44, 189.39], // h=160
+                    [99.10, 102.02, 105.13, 108.28, 111.42, 114.56, 120.09, 125.59, 131.09, 136.62, 142.14, 147.64, 153.14, 158.64, 164.17, 169.67, 175.34, 181.12, 186.92, 192.87], // h=170
+                    [102.55, 105.47, 108.59, 111.73, 114.87, 118.01, 123.51, 129.01, 134.51, 140.01, 145.57, 151.07, 156.56, 162.06, 167.59, 173.09, 178.76, 184.54, 190.35, 196.30], // h=180
+                    [106.03, 108.95, 112.06, 115.21, 118.35, 121.49, 126.99, 132.49, 137.99, 143.52, 149.05, 154.54, 160.04, 165.54, 171.07, 176.57, 182.24, 188.02, 193.83, 199.77], // h=190
+                    [109.48, 112.40, 115.52, 118.66, 121.80, 124.94, 130.44, 135.94, 141.44, 146.94, 152.50, 158.00, 163.50, 168.99, 174.52, 180.02, 185.69, 191.47, 197.28, 203.23], // h=200
+                    [112.93, 115.85, 118.97, 122.11, 125.25, 128.39, 133.89, 139.39, 144.89, 150.39, 155.95, 161.45, 166.95, 172.45, 177.97, 183.47, 189.14, 194.92, 200.73, 206.68], // h=210
+                    [116.58, 119.50, 122.61, 125.78, 128.90, 132.04, 137.37, 142.87, 148.37, 153.87, 159.43, 164.93, 170.43, 175.92, 181.45, 186.95, 192.62, 198.40, 204.21, 210.16], // h=220
+                    [119.86, 122.78, 125.90, 129.04, 132.18, 135.32, 140.82, 146.32, 151.82, 157.32, 162.88, 168.38, 173.88, 179.38, 184.90, 190.40, 196.07, 201.85, 207.66, 213.61], // h=230
+                    [123.34, 126.26, 129.38, 132.52, 135.63, 138.78, 144.30, 149.80, 155.30, 160.80, 166.36, 171.86, 177.36, 182.86, 188.38, 193.88, 199.55, 205.33, 211.14, 217.09]  // h=240
+                ],
+                prices_bronce: [
+                    [64.93, 67.82, 70.93, 73.99, 77.05, 80.30, 85.97, 91.61, 97.17, 102.78, 108.36, 113.92, 119.50, 125.03, 130.47, 136.28, 142.03, 147.89, 153.79, 159.82], // h=50
+                    [66.44, 69.33, 72.45, 75.62, 78.73, 81.87, 87.57, 93.21, 98.85, 104.52, 110.13, 115.77, 121.38, 126.99, 132.57, 138.19, 143.91, 149.80, 155.69, 161.73], // h=60
+                    [70.06, 72.95, 76.07, 79.24, 82.35, 85.52, 91.16, 96.80, 102.47, 108.08, 113.72, 119.39, 124.94, 130.53, 136.17, 141.75, 147.50, 153.37, 159.23, 165.26], // h=70
+                    [73.71, 76.60, 79.71, 82.86, 85.97, 89.14, 94.72, 100.39, 106.00, 111.62, 117.28, 122.92, 128.48, 134.06, 139.70, 145.29, 151.04, 156.93, 162.77, 168.83], // h=80
+                    [77.30, 80.19, 83.30, 86.45, 89.59, 92.73, 98.32, 103.98, 109.60, 115.21, 120.82, 126.40, 132.04, 137.51, 143.24, 148.82, 154.57, 160.46, 166.33, 172.36], // h=90
+                    [80.89, 83.78, 86.90, 90.07, 93.18, 96.32, 101.88, 107.24, 113.13, 118.80, 124.35, 129.91, 135.61, 141.16, 146.74, 152.33, 158.03, 163.97, 169.84, 175.87], // h=100
+                    [84.48, 87.35, 90.49, 93.63, 96.74, 99.92, 105.44, 111.08, 116.69, 122.31, 127.89, 133.47, 139.11, 144.70, 150.25, 155.84, 161.59, 167.48, 173.34, 179.38], // h=110
+                    [88.10, 90.94, 94.08, 97.22, 100.34, 103.51, 109.03, 114.62, 120.29, 125.87, 131.45, 137.04, 142.65, 148.26, 153.81, 159.43, 165.15, 171.04, 176.91, 182.94], // h=120
+                    [91.69, 94.56, 97.67, 100.81, 103.96, 107.10, 112.57, 118.18, 123.82, 129.40, 134.99, 140.60, 146.21, 151.77, 157.32, 162.93, 168.66, 174.55, 180.41, 186.45], // h=130
+                    [95.29, 98.15, 101.26, 104.43, 107.55, 110.69, 116.16, 121.80, 127.36, 132.97, 138.58, 144.16, 149.72, 155.33, 160.91, 166.47, 172.19, 178.09, 183.95, 189.98], // h=140
+                    [98.85, 101.73, 104.83, 107.97, 111.10, 114.24, 119.74, 125.35, 130.95, 136.52, 142.12, 147.69, 153.27, 158.85, 164.45, 170.01, 175.75, 181.64, 187.50, 193.53], // h=150
+                    [100.17, 103.03, 106.14, 109.31, 112.43, 115.57, 121.01, 126.63, 132.27, 137.91, 143.52, 149.10, 154.68, 160.30, 165.91, 171.46, 177.19, 183.08, 188.94, 194.98], // h=160
+                    [103.39, 106.23, 109.37, 112.51, 115.63, 118.80, 124.27, 129.88, 135.49, 141.13, 146.77, 152.42, 157.97, 163.55, 169.16, 174.75, 180.47, 186.36, 192.23, 198.26], // h=170
+                    [106.59, 109.48, 112.60, 115.77, 118.88, 122.03, 127.58, 133.22, 138.83, 144.42, 150.06, 155.67, 161.25, 166.86, 172.47, 178.03, 183.78, 189.67, 195.51, 201.57], // h=180
+                    [109.88, 112.74, 115.88, 119.02, 122.14, 125.31, 130.84, 136.45, 142.11, 147.73, 153.31, 158.92, 164.53, 170.12, 175.76, 181.34, 187.06, 192.96, 198.82, 204.85], // h=190
+                    [113.16, 116.05, 119.16, 122.33, 125.45, 128.59, 134.20, 139.81, 145.43, 151.07, 156.65, 162.23, 167.87, 173.46, 179.07, 184.68, 190.40, 196.30, 202.16, 208.19], // h=200
+                    [116.47, 119.36, 122.47, 125.62, 128.76, 131.90, 137.49, 143.12, 148.76, 154.35, 159.99, 165.60, 171.18, 176.79, 182.41, 187.93, 193.69, 199.58, 205.41, 211.47], // h=210
+                    [119.78, 122.70, 125.81, 128.96, 132.07, 135.24, 140.82, 146.44, 152.10, 157.69, 163.27, 168.88, 174.52, 180.11, 185.75, 191.27, 197.00, 202.89, 208.75, 214.79], // h=220
+                    [123.34, 126.23, 129.35, 132.49, 135.63, 138.78, 144.19, 149.80, 155.44, 161.05, 166.64, 172.22, 177.83, 183.47, 189.08, 194.64, 200.36, 206.26, 212.12, 218.15], // h=230
+                    [126.46, 129.38, 132.49, 135.66, 138.78, 141.92, 147.56, 153.17, 158.75, 164.42, 170.00, 175.59, 181.20, 186.81, 192.42, 197.95, 203.70, 209.59, 215.46, 221.49], // h=240
+                    [129.85, 132.77, 135.89, 139.06, 142.14, 145.29, 150.95, 156.56, 162.15, 167.73, 173.40, 178.96, 184.57, 190.15, 195.76, 201.32, 207.07, 212.96, 218.83, 224.89]  // h=250
+                ],
+                prices_madera: [
+                    [80.14, 83.69, 87.56, 91.31, 95.09, 99.10, 106.12, 113.07, 119.94, 126.87, 133.74, 140.61, 147.50, 154.31, 161.04, 168.20, 175.29, 182.54, 189.81, 197.26], // h=50
+                    [82.02, 85.57, 89.41, 93.33, 97.17, 101.07, 108.08, 115.04, 122.02, 129.00, 135.93, 142.89, 149.81, 156.74, 163.64, 170.56, 177.63, 184.91, 192.18, 199.62], // h=60
+                    [86.46, 90.04, 93.88, 97.81, 101.64, 105.57, 112.52, 119.48, 126.46, 133.39, 140.37, 147.36, 154.23, 161.10, 168.08, 174.95, 182.05, 189.29, 196.54, 203.98], // h=70
+                    [90.97, 94.54, 98.38, 102.28, 106.12, 110.01, 116.91, 123.92, 130.85, 137.78, 144.76, 151.72, 158.58, 165.48, 172.44, 179.34, 186.43, 193.71, 200.89, 208.37], // h=80
+                    [95.41, 98.99, 102.83, 106.69, 110.59, 114.46, 121.36, 128.34, 135.27, 142.19, 149.12, 156.02, 162.97, 169.72, 176.80, 183.66, 190.79, 198.07, 205.31, 212.75], // h=90
+                    [99.86, 103.40, 107.24, 111.17, 115.01, 118.90, 125.74, 132.35, 139.62, 146.64, 153.48, 160.35, 167.39, 174.23, 181.12, 188.02, 195.12, 202.39, 209.64, 217.08], // h=100
+                    [104.27, 107.82, 111.69, 115.55, 119.42, 123.32, 130.16, 137.11, 144.04, 150.94, 157.86, 164.73, 171.72, 178.58, 185.45, 192.35, 199.45, 206.72, 213.97, 221.41], // h=110
+                    [108.74, 112.24, 116.13, 120.00, 123.84, 127.76, 134.57, 141.56, 148.46, 155.35, 162.25, 169.15, 176.05, 183.00, 189.84, 196.77, 203.84, 211.11, 218.35, 225.80], // h=120
+                    [113.19, 116.71, 120.55, 124.44, 128.31, 132.18, 138.93, 145.86, 152.84, 159.71, 166.61, 173.53, 180.46, 187.33, 194.17, 201.10, 208.17, 215.44, 222.68, 230.13], // h=130
+                    [117.60, 121.15, 124.99, 128.89, 132.76, 136.62, 143.38, 150.33, 157.20, 164.13, 171.05, 177.95, 184.79, 191.72, 198.61, 205.48, 212.52, 219.80, 227.04, 234.49], // h=140
+                    [123.64, 127.16, 131.02, 134.92, 138.76, 142.65, 149.38, 156.30, 163.26, 170.22, 177.14, 184.04, 190.94, 197.86, 204.79, 211.63, 218.70, 225.97, 233.22, 240.66], // h=150
+                    [127.62, 131.11, 135.01, 138.87, 142.71, 146.64, 153.39, 160.32, 167.24, 174.20, 181.15, 188.17, 194.98, 201.87, 208.80, 215.70, 222.74, 230.01, 237.26, 244.70], // h=160
+                    [131.57, 135.12, 138.99, 142.89, 146.72, 150.62, 157.46, 164.44, 171.37, 178.24, 185.22, 192.15, 198.73, 205.94, 212.87, 219.74, 226.84, 234.11, 241.33, 248.80], // h=170
+                    [135.61, 139.16, 143.03, 146.90, 150.76, 154.66, 161.50, 168.43, 175.41, 182.34, 189.23, 196.16, 203.09, 209.98, 216.94, 223.84, 230.88, 238.15, 245.40, 252.84], // h=180
+                    [139.68, 143.23, 147.07, 150.99, 154.83, 158.73, 165.66, 172.58, 179.51, 186.46, 193.36, 200.23, 207.21, 214.08, 221.01, 227.94, 235.01, 242.28, 249.52, 256.97], // h=190
+                    [143.75, 147.33, 151.17, 155.04, 158.93, 162.80, 169.70, 176.65, 183.61, 190.48, 197.46, 204.39, 211.28, 218.21, 225.14, 231.98, 239.07, 246.35, 253.53, 261.01], // h=200
+                    [147.85, 151.46, 155.29, 159.16, 163.00, 166.93, 173.82, 180.75, 187.73, 194.63, 201.53, 208.45, 215.41, 222.31, 229.26, 236.07, 243.14, 250.42, 257.66, 265.11], // h=210
+                    [152.24, 155.81, 159.65, 163.52, 167.39, 171.28, 177.98, 184.91, 191.86, 198.79, 205.68, 212.58, 219.51, 226.46, 233.39, 240.23, 247.30, 254.57, 261.82, 269.26], // h=220
+                    [156.07, 159.68, 163.52, 167.44, 171.28, 175.18, 182.13, 189.06, 195.96, 202.94, 209.84, 216.74, 223.66, 230.59, 237.52, 244.33, 251.43, 258.70, 265.94, 273.39], // h=230
+                    [160.29, 167.73, 167.73, 171.63, 175.44, 179.34, 186.32, 193.25, 200.14, 207.04, 214.02, 220.89, 227.82, 234.69, 241.61, 248.48, 255.58, 262.86, 270.10, 277.57]  // h=240
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    if (colorId === "blanco") return this.prices_blanco[hIdx][wIdx];
+                    if (colorId === "madera") return this.prices_madera[hIdx][wIdx];
+                    return this.prices_bronce[hIdx][wIdx];
+                }
+            },
+
+            // MOSQUITERA ENROLLABLE LATERAL 1 HOJA
+            enrollable_lat: {
+                nombre: "Mosquitera Enrollable Lateral 1 Hoja",
+                widths: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                heights: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "plata_gris_bronce", nombre: "Plata, Gris 7016 y Bronce" },
+                    { id: "madera", nombre: "Efecto Madera (Golden Oak / Walnut)" }
+                ],
+                prices_blanco: [
+                    [73.93, 77.05, 80.19, 89.28, 92.62, 95.99, 99.30, 102.66, 109.54, 112.99, 119.92, 127.36, 130.92, 138.69, 142.37, 146.04, 154.26, 158.05, 161.87, 165.63], // h=50
+                    [77.05, 80.19, 83.30, 92.62, 95.99, 99.30, 102.66, 106.00, 112.99, 116.44, 123.37, 130.92, 134.48, 142.37, 146.04, 149.72, 158.05, 161.87, 165.63, 169.44], // h=60
+                    [85.91, 89.28, 92.62, 95.99, 99.30, 102.66, 106.00, 109.37, 116.44, 119.92, 130.27, 134.48, 138.07, 146.04, 149.72, 158.05, 161.87, 165.63, 169.44, 178.34], // h=70
+                    [89.28, 92.62, 95.99, 99.30, 102.66, 106.00, 109.37, 112.68, 119.92, 123.37, 137.20, 138.07, 141.64, 149.72, 153.39, 161.87, 165.63, 169.44, 178.34, 182.24], // h=80
+                    [92.62, 95.99, 99.30, 102.66, 106.00, 109.37, 112.68, 116.05, 123.37, 126.82, 140.38, 141.64, 145.20, 153.39, 157.10, 165.63, 169.44, 178.34, 182.24, 186.11], // h=90
+                    [95.99, 99.30, 102.66, 109.54, 112.99, 116.44, 119.92, 123.37, 126.82, 130.27, 144.19, 145.20, 148.76, 157.10, 160.75, 169.44, 173.20, 182.24, 186.11, 190.01], // h=100
+                    [99.30, 102.66, 106.00, 112.99, 116.44, 119.92, 123.37, 126.82, 130.27, 138.07, 147.75, 148.76, 152.33, 160.75, 169.44, 173.20, 182.24, 186.11, 190.01, 193.94], // h=110
+                    [102.66, 106.00, 109.37, 116.44, 119.92, 123.37, 126.82, 133.02, 143.77, 150.20, 160.18, 163.75, 172.53, 176.23, 185.35, 189.17, 192.93, 202.52, 206.42, 210.32], // h=120
+                    [106.00, 109.37, 112.68, 119.92, 123.37, 126.82, 130.27, 136.50, 147.33, 153.76, 163.75, 167.34, 176.23, 179.91, 189.17, 192.93, 202.52, 206.42, 210.32, 214.22], // h=130
+                    [109.37, 112.68, 116.05, 123.37, 126.82, 130.27, 133.75, 139.95, 150.90, 157.32, 167.34, 176.23, 179.91, 183.58, 192.93, 196.74, 206.42, 210.32, 214.22, 218.12], // h=140
+                    [112.68, 116.05, 119.39, 126.82, 130.27, 133.75, 137.20, 143.41, 154.49, 160.91, 170.90, 179.91, 183.58, 192.93, 196.74, 200.53, 210.32, 214.22, 218.12, 222.05], // h=150
+                    [116.05, 119.39, 122.75, 130.27, 133.75, 137.20, 140.66, 146.86, 158.05, 164.48, 174.47, 183.58, 187.26, 196.74, 200.53, 204.32, 214.22, 218.12, 222.05, 225.95], // h=160
+                    [119.39, 122.75, 126.07, 133.75, 137.20, 140.66, 144.11, 150.34, 161.62, 168.04, 178.03, 187.26, 190.94, 200.53, 204.32, 208.11, 218.12, 222.05, 225.95, 229.85], // h=170
+                    [122.75, 126.07, 129.43, 137.20, 140.66, 144.11, 147.59, 153.79, 165.18, 171.60, 181.59, 190.94, 194.64, 204.32, 208.11, 211.92, 222.05, 225.95, 229.85, 233.75], // h=180
+                    [126.07, 129.43, 132.77, 140.66, 144.11, 147.59, 151.04, 157.24, 168.74, 175.17, 185.18, 194.64, 198.32, 208.11, 211.92, 215.68, 225.95, 229.85, 233.75, 237.65], // h=190
+                    [129.43, 132.77, 136.14, 144.11, 147.59, 151.04, 154.49, 160.69, 172.33, 178.76, 188.75, 198.32, 201.96, 211.92, 215.68, 219.50, 229.85, 233.75, 237.65, 241.55], // h=200
+                    [132.77, 136.14, 139.45, 147.59, 151.04, 154.49, 157.94, 164.17, 175.90, 182.32, 192.31, 201.96, 205.67, 215.68, 219.50, 223.26, 233.75, 237.65, 241.55, 249.45], // h=210
+                    [136.14, 139.45, 142.82, 151.04, 154.49, 157.94, 161.42, 167.62, 179.46, 185.87, 195.87, 205.67, 209.34, 219.50, 223.26, 227.07, 241.55, 245.45, 249.35, 253.28], // h=220
+                    [139.45, 142.82, 146.16, 154.49, 157.94, 161.42, 164.87, 171.07, 183.02, 189.45, 199.44, 209.34, 213.05, 223.26, 227.07, 230.86, 241.55, 245.45, 249.35, 253.28], // h=230
+                    [142.82, 146.16, 149.52, 157.94, 161.42, 164.87, 168.32, 174.52, 186.59, 193.01, 203.03, 213.05, 216.69, 227.07, 230.86, 234.65, 245.45, 249.35, 253.28, 257.18]  // h=240
+                ],
+                prices_bronce: [
+                    [76.51, 79.66, 82.77, 92.06, 95.37, 98.74, 102.08, 105.44, 112.40, 115.85, 122.78, 130.30, 133.87, 141.72, 145.40, 149.10, 157.41, 161.19, 164.98, 173.23], // h=50
+                    [79.66, 82.77, 85.89, 95.37, 98.74, 102.08, 105.44, 108.75, 115.85, 119.30, 126.23, 133.87, 137.43, 145.40, 149.10, 152.75, 161.19, 164.98, 168.80, 172.56], // h=60
+                    [88.69, 92.06, 95.37, 98.74, 102.08, 105.44, 108.75, 112.12, 119.30, 122.78, 133.14, 137.43, 140.99, 149.10, 158.29, 161.19, 164.98, 168.80, 172.56, 181.54], // h=70
+                    [92.06, 95.37, 98.74, 102.08, 105.44, 108.75, 112.12, 115.46, 122.78, 126.23, 140.07, 140.99, 144.58, 152.75, 156.45, 164.98, 168.80, 172.56, 181.54, 185.44], // h=80
+                    [95.37, 98.74, 102.08, 105.44, 108.75, 112.12, 115.46, 118.83, 126.23, 129.68, 143.18, 144.58, 148.15, 156.45, 160.13, 168.80, 172.56, 176.37, 185.44, 189.36], // h=90
+                    [98.74, 102.08, 105.44, 112.40, 115.85, 119.30, 122.78, 126.23, 129.68, 133.14, 146.91, 148.15, 151.71, 160.13, 163.80, 172.56, 176.37, 185.44, 189.36, 193.26], // h=100
+                    [102.08, 105.44, 108.75, 115.85, 119.30, 122.78, 126.23, 129.68, 133.14, 140.99, 150.42, 151.71, 155.27, 163.80, 172.56, 176.37, 180.13, 189.36, 193.26, 197.16], // h=110
+                    [105.44, 108.75, 112.12, 119.30, 122.78, 126.23, 129.68, 135.89, 143.85, 147.42, 154.57, 158.14, 166.75, 170.43, 179.40, 183.19, 186.98, 196.38, 200.28, 204.18], // h=120
+                    [108.75, 112.12, 115.46, 122.78, 126.23, 129.68, 133.14, 139.37, 150.28, 153.84, 161.00, 164.56, 173.37, 177.05, 186.22, 190.01, 199.49, 203.39, 207.29, 211.22], // h=130
+                    [112.12, 115.46, 118.83, 126.23, 129.68, 133.14, 136.62, 142.82, 156.70, 160.27, 167.42, 176.32, 179.99, 183.70, 193.04, 196.83, 206.54, 210.44, 214.34, 215.26], // h=140
+                    [115.46, 118.83, 122.14, 129.68, 133.14, 136.62, 140.07, 146.27, 163.13, 166.69, 173.85, 182.94, 186.64, 196.10, 199.86, 203.67, 213.55, 217.41, 221.38, 225.25], // h=150
+                    [118.83, 122.14, 125.50, 133.14, 136.62, 140.07, 143.52, 149.72, 169.56, 173.12, 180.27, 189.56, 193.26, 202.89, 206.70, 210.49, 220.59, 224.49, 228.39, 232.29], // h=160
+                    [122.14, 125.50, 128.84, 136.62, 140.07, 143.52, 146.94, 153.20, 175.98, 179.54, 186.70, 196.21, 199.86, 209.73, 213.52, 217.31, 227.61, 231.51, 235.41, 239.34], // h=170
+                    [125.50, 128.84, 132.21, 140.07, 143.52, 146.07, 150.42, 156.65, 182.41, 185.97, 193.12, 203.09, 206.51, 216.55, 220.37, 224.13, 234.62, 238.52, 242.45, 246.35], // h=180
+                    [128.84, 132.21, 135.52, 143.52, 146.07, 150.42, 153.87, 160.10, 188.83, 192.39, 199.55, 209.45, 213.13, 223.40, 227.16, 230.97, 241.67, 245.57, 249.47, 253.37], // h=190
+                    [132.21, 135.52, 138.89, 146.07, 150.42, 153.87, 157.32, 163.55, 195.26, 198.82, 205.98, 216.08, 219.75, 230.19, 234.01, 237.79, 248.71, 252.61, 256.48, 260.38], // h=200
+                    [135.52, 138.89, 142.23, 150.42, 153.87, 157.32, 160.77, 167.03, 201.68, 205.25, 212.37, 222.70, 226.37, 237.04, 240.82, 244.64, 255.72, 259.62, 263.52, 267.45], // h=210
+                    [138.89, 142.23, 145.59, 153.87, 157.32, 160.77, 164.25, 170.48, 208.11, 211.67, 218.80, 229.32, 233.00, 243.85, 247.67, 251.43, 262.74, 266.64, 270.57, 274.47], // h=220
+                    [142.23, 145.59, 148.90, 157.32, 160.77, 164.25, 167.70, 173.93, 214.53, 218.10, 225.22, 235.94, 239.62, 250.70, 254.46, 258.28, 269.75, 273.68, 277.58, 281.48], // h=230
+                    [145.59, 148.90, 152.27, 160.77, 164.25, 167.70, 171.15, 177.38, 220.96, 224.52, 231.65, 242.56, 246.27, 257.49, 261.31, 265.09, 276.79, 280.69, 284.59, 288.49]  // h=240
+                ],
+                prices_madera: [
+                    [94.44, 98.32, 102.16, 113.63, 117.72, 121.87, 125.99, 130.17, 138.72, 143.01, 151.56, 160.85, 165.22, 174.92, 179.45, 184.04, 194.30, 198.97, 203.64, 208.34], // h=50
+                    [98.32, 102.16, 106.01, 117.72, 121.87, 125.99, 130.17, 134.24, 143.01, 147.24, 155.82, 165.22, 169.64, 179.45, 184.04, 188.55, 198.97, 203.64, 208.34, 212.99], // h=60
+                    [109.48, 113.63, 117.72, 121.87, 125.99, 130.17, 134.24, 138.39, 147.24, 151.56, 164.34, 169.64, 174.04, 184.04, 188.55, 198.97, 203.64, 208.34, 212.99, 224.06], // h=70
+                    [113.63, 117.72, 121.87, 125.99, 130.17, 134.24, 138.39, 142.51, 151.56, 155.82, 172.88, 174.04, 178.46, 188.55, 193.11, 203.64, 208.34, 212.99, 224.06, 228.90], // h=80
+                    [118.00, 121.87, 125.99, 130.17, 138.72, 143.01, 142.51, 146.66, 155.82, 160.05, 176.73, 178.46, 182.86, 193.11, 197.62, 208.34, 212.99, 224.06, 228.90, 233.74], // h=90
+                    [121.87, 125.99, 130.17, 138.72, 143.01, 147.24, 151.56, 155.82, 160.05, 160.05, 181.32, 182.86, 187.23, 197.62, 201.12, 212.99, 217.69, 228.90, 233.74, 238.55], // h=100
+                    [125.99, 130.17, 134.24, 143.01, 147.24, 151.56, 155.82, 160.05, 164.34, 174.04, 185.67, 187.23, 191.66, 202.18, 212.99, 217.69, 222.33, 233.74, 238.55, 243.36], // h=110
+                    [130.17, 134.24, 138.39, 147.24, 151.56, 164.06, 160.05, 167.74, 177.56, 181.95, 190.80, 195.18, 205.84, 210.35, 221.45, 226.12, 230.80, 242.40, 247.21, 252.02], // h=120
+                    [134.24, 138.39, 142.51, 151.56, 164.06, 160.05, 164.34, 172.00, 185.47, 189.90, 198.72, 203.12, 214.00, 218.54, 229.83, 234.51, 246.24, 251.05, 255.86, 260.73], // h=130
+                    [138.39, 142.51, 146.66, 164.06, 160.05, 164.34, 168.62, 176.26, 193.42, 197.81, 206.64, 217.63, 222.17, 226.73, 238.27, 242.94, 254.93, 259.74, 264.55, 265.68], // h=140
+                    [142.51, 146.66, 150.76, 160.05, 164.34, 168.62, 172.88, 180.55, 201.36, 205.73, 214.58, 225.79, 230.36, 242.04, 246.68, 251.41, 263.59, 268.42, 273.23, 278.04], // h=150
+                    [146.66, 150.76, 154.91, 164.34, 168.62, 172.88, 177.14, 184.79, 209.30, 213.67, 222.52, 233.96, 238.55, 250.42, 255.12, 259.79, 272.27, 277.08, 281.89, 286.73], // h=160
+                    [150.76, 154.91, 159.03, 168.62, 172.88, 177.14, 181.35, 189.10, 217.19, 221.62, 230.44, 242.20, 246.68, 258.89, 263.56, 268.23, 280.93, 285.74, 290.55, 295.41], // h=170
+                    [154.91, 159.03, 163.18, 172.88, 177.14, 180.28, 185.67, 193.36, 225.13, 229.56, 238.38, 250.67, 254.90, 267.30, 272.00, 276.64, 289.59, 294.40, 299.24, 304.07], // h=180
+                    [159.03, 163.18, 167.28, 177.14, 180.28, 185.67, 189.93, 197.59, 233.08, 237.45, 246.30, 258.53, 263.06, 275.74, 280.38, 285.08, 298.30, 303.08, 307.89, 312.73], // h=190
+                    [163.18, 167.28, 171.43, 180.28, 185.67, 189.93, 194.16, 201.88, 241.02, 245.39, 254.21, 266.69, 271.23, 284.12, 288.82, 293.52, 306.99, 311.80, 316.55, 321.39], // h=200
+                    [167.28, 171.43, 175.00, 185.67, 189.93, 194.16, 198.45, 206.17, 248.94, 253.33, 262.13, 274.86, 279.42, 292.58, 297.26, 301.96, 315.64, 320.45, 325.26, 330.10], // h=210
+                    [171.43, 175.55, 179.70, 189.93, 194.16, 198.45, 202.73, 210.43, 256.85, 261.28, 270.07, 283.05, 287.58, 300.97, 305.69, 310.34, 324.30, 329.11, 333.98, 338.76], // h=220
+                    [175.55, 179.70, 183.77, 194.16, 198.45, 202.73, 206.99, 214.69, 264.80, 269.19, 277.99, 291.24, 295.74, 309.43, 314.08, 318.78, 332.96, 337.80, 342.64, 347.42], // h=230
+                    [179.70, 183.77, 187.95, 198.45, 202.73, 206.99, 211.25, 218.92, 272.74, 277.11, 285.90, 299.40, 303.96, 317.82, 322.54, 327.22, 341.65, 346.46, 351.29, 356.08]  // h=240
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    if (colorId === "blanco") return this.prices_blanco[hIdx][wIdx];
+                    if (colorId === "madera") return this.prices_madera[hIdx][wIdx];
+                    return this.prices_bronce[hIdx][wIdx];
+                }
+            },
+
+            // MOSQUITERA CORREDERA CURVA
+            corredera_curva: {
+                nombre: "Mosquitera Corredera Curva",
+                widths: [50, 60, 70, 80, 90, 100],
+                heights: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "plata_gris_bronce", nombre: "Plata, Gris 7016 y Bronce" },
+                    { id: "madera", nombre: "Efecto Madera (Golden Oak / Walnut)" }
+                ],
+                prices_blanco: [
+                    [45.05, 47.27, 49.49, 51.71, 53.93, 56.14, 58.36, 60.58, 62.80, 65.01], // h=50
+                    [47.73, 49.94, 52.16, 54.38, 56.60, 58.82, 61.03, 63.25, 65.47, 67.69], // h=60
+                    [50.37, 52.59, 54.81, 57.02, 59.24, 61.46, 63.68, 65.90, 68.11, 70.33], // h=70
+                    [53.04, 55.26, 57.48, 59.70, 61.92, 64.13, 66.35, 68.57, 70.79, 73.00], // h=80
+                    [55.69, 57.91, 60.12, 62.34, 64.56, 66.78, 69.00, 71.21, 73.43, 75.65], // h=90
+                    [58.36, 60.58, 62.80, 65.01, 67.23, 69.45, 71.67, 73.89, 76.10, 78.32], // h=100
+                    [61.03, 63.25, 65.47, 67.69, 69.90, 72.12, 74.34, 76.56, 78.75, 80.97], // h=110
+                    [63.68, 65.90, 68.11, 70.33, 72.55, 74.77, 76.99, 79.20, 81.42, 83.64], // h=120
+                    [66.35, 68.57, 70.79, 73.00, 75.22, 77.44, 79.66, 81.88, 84.09, 86.31], // h=130
+                    [69.00, 71.21, 73.43, 75.65, 77.87, 80.09, 82.30, 84.52, 86.74, 88.96], // h=140
+                    [71.67, 73.89, 76.10, 78.32, 80.54, 82.76, 84.98, 87.19, 89.41, 91.63], // h=150
+                    [74.31, 78.08, 81.82, 85.56, 89.31, 93.05, 96.79, 100.53, 104.27, 108.01], // h=160
+                    [76.99, 80.73, 84.47, 88.21, 91.95, 95.72, 99.46, 103.20, 106.94, 110.68], // h=170
+                    [79.66, 83.40, 87.14, 90.88, 94.62, 98.36, 102.11, 105.85, 109.59, 113.33], // h=180
+                    [82.30, 86.05, 89.79, 93.53, 97.30, 101.04, 104.78, 108.52, 112.26, 116.00], // h=190
+                    [84.98, 88.72, 92.46, 96.20, 99.94, 103.68, 107.42, 111.16, 114.90, 118.67], // h=200
+                    [87.62, 91.36, 95.13, 98.87, 102.61, 106.35, 110.09, 113.84, 117.58, 121.32], // h=210
+                    [90.29, 94.04, 97.78, 101.52, 105.26, 109.00, 112.74, 116.51, 120.25, 123.99], // h=220
+                    [92.94, 96.68, 100.45, 104.19, 107.93, 111.67, 115.41, 119.15, 122.92, 126.64], // h=230
+                    [95.61, 99.35, 103.09, 106.83, 110.58, 114.32, 118.08, 121.83, 125.59, 129.31]  // h=240
+                ],
+                prices_bronce: [
+                    [51.81, 54.36, 56.91, 59.46, 62.01, 64.56, 67.12, 69.67, 72.22, 74.77], // h=50
+                    [54.88, 57.44, 59.99, 62.54, 65.09, 67.64, 70.19, 72.74, 75.29, 77.84], // h=60
+                    [57.93, 60.48, 63.03, 65.58, 68.13, 70.68, 73.23, 75.78, 78.33, 80.88], // h=70
+                    [61.00, 63.55, 66.10, 68.65, 71.20, 73.75, 76.30, 78.85, 81.40, 83.96], // h=80
+                    [64.04, 66.59, 69.14, 71.69, 74.24, 76.80, 79.35, 81.90, 84.45, 87.00], // h=90
+                    [67.12, 69.67, 72.22, 74.77, 77.32, 79.87, 82.42, 84.97, 87.52, 90.07], // h=100
+                    [70.19, 72.74, 75.29, 77.84, 80.39, 82.94, 85.49, 88.04, 90.56, 93.11], // h=110
+                    [73.23, 75.78, 78.33, 80.88, 84.43, 85.98, 88.53, 91.08, 93.64, 96.19], // h=120
+                    [76.30, 78.85, 81.40, 83.96, 86.51, 89.06, 91.61, 94.16, 96.71, 99.26], // h=130
+                    [79.35, 81.90, 84.45, 87.00, 89.55, 92.10, 94.65, 97.20, 99.75, 102.30], // h=140
+                    [82.42, 84.97, 87.52, 90.07, 92.62, 95.17, 97.72, 100.27, 102.82, 105.37], // h=150
+                    [85.46, 89.79, 94.10, 98.40, 102.70, 107.00, 111.31, 115.61, 119.91, 124.21], // h=160
+                    [88.53, 92.84, 97.14, 101.44, 105.74, 110.08, 114.38, 118.68, 122.98, 127.29], // h=170
+                    [91.61, 95.91, 100.21, 104.51, 108.82, 113.12, 117.42, 121.72, 126.03, 130.33], // h=180
+                    [94.65, 98.95, 103.25, 107.56, 111.89, 116.19, 120.49, 124.80, 129.10, 133.40], // h=190
+                    [97.72, 102.02, 106.33, 110.63, 114.93, 119.23, 123.54, 127.84, 132.14, 136.47], // h=200
+                    [100.76, 105.07, 109.40, 113.70, 118.00, 122.31, 126.61, 130.91, 135.21, 139.52], // h=210
+                    [103.84, 108.14, 112.44, 116.74, 121.05, 125.35, 129.65, 133.98, 138.29, 142.59], // h=220
+                    [106.88, 111.18, 115.52, 119.82, 124.12, 128.42, 132.72, 137.03, 141.36, 145.63], // h=230
+                    [109.95, 114.26, 118.56, 122.86, 127.16, 131.46, 135.80, 140.10, 144.43, 148.70]  // h=240
+                ],
+                prices_madera: [
+                    [62.56, 65.64, 68.72, 71.80, 74.88, 77.96, 81.04, 84.12, 87.20, 90.28], // h=50
+                    [66.27, 69.35, 72.43, 75.51, 78.59, 81.67, 84.75, 87.83, 90.91, 93.99], // h=60
+                    [69.94, 73.02, 76.10, 79.18, 82.26, 85.34, 88.42, 91.50, 94.58, 97.66], // h=70
+                    [73.65, 76.73, 79.81, 82.89, 85.97, 89.05, 92.13, 95.21, 98.29, 101.37], // h=80
+                    [77.33, 80.41, 83.49, 86.57, 89.65, 92.73, 95.81, 98.89, 101.97, 105.05], // h=90
+                    [81.04, 84.12, 87.20, 90.28, 93.36, 96.44, 99.52, 102.60, 105.68, 108.76], // h=100
+                    [84.75, 87.83, 90.91, 93.99, 97.07, 100.15, 103.23, 106.31, 109.35, 112.43], // h=110
+                    [88.42, 91.50, 94.58, 97.66, 100.74, 103.82, 106.90, 109.99, 113.07, 116.14], // h=120
+                    [92.13, 95.21, 98.29, 101.37, 104.45, 107.53, 110.61, 113.69, 116.77, 119.85], // h=130
+                    [95.81, 98.89, 101.97, 105.05, 108.13, 111.21, 114.29, 117.36, 120.44, 123.52], // h=140
+                    [99.52, 102.60, 105.68, 108.76, 111.84, 114.92, 118.00, 121.08, 124.16, 127.23], // h=150
+                    [103.19, 108.42, 113.62, 118.81, 124.01, 129.20, 134.40, 139.59, 144.79, 149.98], // h=160
+                    [106.90, 112.10, 117.29, 122.49, 127.68, 132.91, 138.11, 143.30, 148.50, 153.69], // h=170
+                    [110.61, 115.81, 121.00, 126.20, 131.39, 136.59, 141.78, 146.97, 152.17, 157.36], // h=180
+                    [114.29, 119.48, 124.67, 129.87, 135.10, 140.30, 145.49, 150.69, 155.88, 161.08], // h=190
+                    [118.00, 123.19, 128.39, 133.58, 138.77, 143.97, 149.16, 154.36, 159.55, 164.79], // h=200
+                    [121.67, 126.86, 132.10, 137.29, 142.49, 147.68, 152.87, 158.07, 163.26, 168.46], // h=210
+                    [125.38, 130.57, 135.77, 140.96, 146.16, 151.35, 156.55, 161.78, 166.97, 172.17], // h=220
+                    [129.05, 134.25, 139.48, 144.67, 149.87, 155.06, 160.26, 165.45, 170.69, 175.84], // h=230
+                    [132.76, 137.96, 143.15, 148.35, 153.54, 158.74, 163.97, 169.16, 174.40, 179.55]  // h=240
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    if (colorId === "blanco") return this.prices_blanco[hIdx][wIdx];
+                    if (colorId === "madera") return this.prices_madera[hIdx][wIdx];
+                    return this.prices_bronce[hIdx][wIdx];
+                }
+            },
+
+            // MOSQUITERA FIJA
+            fija: {
+                nombre: "Mosquitera Fija",
+                widths: [50, 60, 70, 80, 90, 100],
+                heights: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "plata_gris_bronce", nombre: "Bronce, Plata y Gris 7016" }
+                ],
+                prices_blanco: [
+                    [39.47, 41.28, 43.07, 44.86, 46.64, 48.46, 50.24, 52.03, 53.84, 55.63], // h=50
+                    [41.78, 43.56, 45.38, 47.17, 48.95, 50.74, 52.55, 54.34, 56.13, 57.91], // h=60
+                    [44.09, 45.87, 47.66, 49.45, 51.26, 53.05, 54.83, 56.65, 58.43, 60.22], // h=70
+                    [46.37, 48.18, 49.97, 51.76, 53.54, 55.36, 57.14, 58.93, 60.72, 62.53], // h=80
+                    [48.68, 50.46, 52.25, 54.06, 55.85, 57.64, 59.45, 61.24, 63.02, 64.81], // h=90
+                    [50.99, 52.77, 54.56, 56.35, 58.16, 59.95, 61.73, 63.52, 65.33, 67.12], // h=100
+                    [53.27, 55.05, 56.87, 58.65, 60.44, 62.25, 64.04, 65.83, 67.61, 69.43], // h=110
+                    [55.56, 57.36, 59.15, 60.96, 62.75, 64.54, 66.32, 68.14, 69.92, 71.71], // h=120
+                    [57.86, 59.67, 61.46, 63.24, 65.06, 66.84, 68.63, 70.42, 72.23, 74.02], // h=130
+                    [60.17, 61.95, 63.77, 65.55, 67.34, 69.13, 70.94, 72.73, 74.51, 76.33], // h=140
+                    [62.47, 64.26, 66.05, 67.86, 69.65, 71.43, 73.22, 75.04, 76.82, 78.61], // h=150
+                    [64.76, 68.03, 71.33, 74.60, 77.87, 81.14, 84.41, 87.71, 90.98, 94.25], // h=160
+                    [67.06, 70.34, 73.61, 76.90, 80.18, 83.45, 86.72, 89.99, 93.26, 96.56], // h=170
+                    [69.37, 72.64, 75.92, 79.19, 82.46, 85.75, 89.03, 92.30, 95.57, 98.84], // h=180
+                    [71.65, 74.93, 78.22, 81.49, 84.77, 88.04, 91.31, 94.61, 97.88, 101.15], // h=190
+                    [73.96, 77.23, 80.51, 83.80, 87.07, 90.35, 93.62, 96.89, 100.16, 103.46], // h=200
+                    [76.27, 79.54, 82.81, 86.08, 89.36, 92.65, 95.92, 99.20, 102.47, 105.74], // h=210
+                    [78.55, 81.82, 85.12, 88.39, 91.66, 94.94, 98.21, 101.50, 104.77, 108.05], // h=220
+                    [80.86, 84.13, 87.40, 90.67, 93.97, 97.24, 100.51, 103.79, 107.06, 110.35], // h=230
+                    [83.14, 86.44, 89.71, 92.98, 96.25, 99.53, 102.82, 106.09, 109.37, 112.64]  // h=240
+                ],
+                prices_bronce: [
+                    [45.39, 47.48, 49.53, 51.58, 53.64, 55.73, 57.78, 59.83, 61.92, 63.98], // h=50
+                    [48.04, 50.10, 52.19, 54.24, 56.29, 58.35, 60.44, 62.49, 64.54, 66.60], // h=60
+                    [50.70, 52.75, 54.81, 56.86, 58.95, 61.00, 63.06, 65.14, 67.20, 69.25], // h=70
+                    [53.32, 55.41, 57.46, 59.52, 61.57, 63.66, 65.71, 67.77, 69.82, 71.91], // h=80
+                    [55.98, 58.03, 60.09, 62.17, 64.23, 66.28, 68.37, 70.42, 72.48, 74.53], // h=90
+                    [58.63, 60.69, 62.74, 64.80, 66.88, 68.94, 70.99, 73.05, 75.13, 77.19], // h=100
+                    [61.26, 63.31, 65.40, 67.45, 69.51, 71.59, 73.65, 75.70, 77.76, 79.84], // h=110
+                    [63.91, 65.97, 68.02, 70.11, 72.16, 74.22, 76.27, 78.36, 80.41, 82.47], // h=120
+                    [66.54, 68.62, 70.68, 72.73, 74.82, 76.87, 78.93, 80.98, 83.07, 85.12], // h=130
+                    [69.19, 71.25, 73.33, 75.39, 77.44, 79.50, 81.58, 83.64, 85.69, 87.78], // h=140
+                    [71.85, 73.90, 75.95, 78.04, 80.10, 82.15, 84.20, 86.29, 88.35, 90.40], // h=150
+                    [74.47, 78.23, 82.02, 85.79, 89.55, 93.31, 97.07, 100.86, 104.62, 108.39], // h=160
+                    [77.12, 80.89, 84.65, 88.44, 92.20, 95.96, 99.72, 103.49, 107.25, 111.04], // h=170
+                    [79.78, 83.54, 87.30, 91.06, 94.83, 98.62, 102.38, 106.14, 109.90, 113.66], // h=180
+                    [82.40, 86.16, 89.96, 93.72, 97.48, 101.24, 105.00, 108.80, 112.56, 116.32], // h=190
+                    [85.06, 88.82, 92.58, 96.37, 100.14, 103.90, 107.66, 111.42, 115.18, 118.97], // h=200
+                    [87.71, 91.47, 95.24, 99.00, 102.76, 106.55, 110.31, 114.07, 117.84, 121.60], // h=210
+                    [90.34, 94.10, 97.89, 101.65, 105.41, 109.18, 112.94, 116.73, 120.49, 124.25], // h=220
+                    [92.99, 96.75, 100.51, 104.28, 108.07, 111.83, 115.59, 119.35, 123.11, 126.91], // h=230
+                    [95.62, 99.41, 103.17, 106.93, 110.69, 114.45, 118.25, 122.01, 125.77, 129.53]  // h=240
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    if (colorId === "blanco") return this.prices_blanco[hIdx][wIdx];
+                    return this.prices_bronce[hIdx][wIdx];
+                }
+            },
+
+            // MOSQUITERA PUERTA PRACTICABLE
+            puerta_practicable: {
+                nombre: "Mosquitera Puerta Practicable",
+                widths: [60, 70, 80, 90, 100],
+                heights: [190, 200, 210, 220, 230, 240],
+                colores: [
+                    { id: "blanco", nombre: "Blanco" },
+                    { id: "plata_gris_bronce", nombre: "Bronce, Plata y Gris 7016" }
+                ],
+                prices_blanco: [
+                    [323.86, 332.08, 340.27, 348.49, 356.71], // h=190
+                    [332.19, 340.44, 348.68, 356.93, 365.17], // h=200
+                    [340.52, 348.79, 357.09, 365.37, 373.64], // h=210
+                    [348.87, 357.17, 365.48, 373.80, 382.10], // h=220
+                    [357.20, 365.56, 373.89, 382.21, 390.57], // h=230
+                    [365.56, 373.94, 382.30, 390.68, 399.04]  // h=240
+                ],
+                prices_bronce: [
+                    [388.62, 398.49, 408.35, 418.17, 428.03], // h=190
+                    [398.62, 408.52, 418.41, 428.31, 438.17], // h=200
+                    [408.63, 418.55, 428.53, 438.42, 448.37], // h=210
+                    [418.66, 428.64, 438.56, 448.56, 458.54], // h=220
+                    [428.66, 438.67, 448.67, 458.68, 468.68], // h=230
+                    [438.67, 448.70, 458.73, 468.82, 478.85]  // h=240
+                ],
+                getPrice: function(wIdx, hIdx, colorId) {
+                    if (colorId === "blanco") return this.prices_blanco[hIdx][wIdx];
+                    return this.prices_bronce[hIdx][wIdx];
+                }
+            }
+        };
+
+        // --- 1.1 BASE DE DATOS COMPLETA DIGITALIZADA DE MARCOS (1 AL 14) ---
+        const MARCOS_STANDARD_DB = [
+            { size: "10X15", w: 10, h: 15, prices: [7.49, 10.14, 10.80, 13.84, 16.36, 19.30, 23.81, 31.01, 37.10, 43.79, 46.00, 54.16, 64.99, 81.31], brillo: 1.00, mate: 1.96, ppvs: 4.67 },
+            { size: "13X18", w: 13, h: 18, prices: [9.30, 12.59, 13.38, 17.17, 20.30, 23.91, 29.54, 38.46, 45.99, 54.32, 57.09, 67.16, 80.59, 100.84], brillo: 1.09, mate: 2.21, ppvs: 5.79 },
+            { size: "15X20", w: 15, h: 20, prices: [10.50, 14.20, 15.11, 19.40, 22.57, 26.66, 32.16, 38.93, 47.37, 54.68, 61.18, 74.35, 88.07, 110.60], brillo: 1.18, mate: 2.49, ppvs: 6.54 },
+            { size: "16X22", w: 16, h: 22, prices: [11.09, 13.05, 15.80, 19.95, 23.00, 27.15, 34.77, 39.45, 48.22, 54.97, 65.15, 76.46, 91.55, 114.43], brillo: 1.31, mate: 2.74, ppvs: 7.10 },
+            { size: "18X24", w: 18, h: 24, prices: [12.26, 14.43, 16.73, 21.42, 25.43, 30.01, 38.42, 43.62, 53.28, 58.21, 66.87, 78.57, 94.28, 117.94], brillo: 1.50, mate: 2.74, ppvs: 7.85 },
+            { size: "20X20", w: 20, h: 20, prices: [11.25, 13.70, 15.72, 21.07, 24.20, 28.09, 35.27, 42.98, 50.77, 55.58, 64.66, 76.04, 91.25, 114.11], brillo: 1.65, mate: 3.21, ppvs: 7.45 },
+            { size: "20X25", w: 20, h: 25, prices: [12.26, 15.11, 17.64, 22.97, 26.83, 31.67, 39.41, 48.43, 57.03, 62.60, 70.06, 82.38, 98.93, 123.73], brillo: 1.68, mate: 3.24, ppvs: 8.85 },
+            { size: "20X50", w: 20, h: 50, prices: [19.62, 24.02, 27.88, 35.63, 42.20, 49.66, 53.60, 64.85, 79.14, 86.23, 97.04, 114.11, 136.93, 171.29], brillo: 4.05, mate: 7.73, ppvs: 11.84 },
+            { size: "22X27", w: 22, h: 27, prices: [13.35, 16.49, 19.20, 24.99, 29.21, 34.48, 42.92, 52.77, 62.09, 68.11, 74.77, 87.48, 105.65, 132.12], brillo: 2.46, mate: 4.64, ppvs: 9.63 },
+            { size: "24X30", w: 24, h: 30, prices: [14.25, 17.60, 20.52, 26.26, 31.12, 36.68, 45.53, 55.08, 64.67, 72.63, 79.74, 93.76, 112.55, 140.80], brillo: 2.46, mate: 4.64, ppvs: 9.84 },
+            { size: "24X33", w: 24, h: 33, prices: [15.01, 18.58, 21.66, 27.74, 32.84, 41.77, 48.05, 58.16, 68.27, 77.00, 83.48, 96.84, 115.54, 144.47], brillo: 3.61, mate: 6.98, ppvs: 10.41 },
+            { size: "27X35", w: 27, h: 35, prices: [16.98, 19.20, 22.38, 28.66, 33.92, 41.25, 49.66, 60.09, 70.56, 79.97, 86.28, 101.49, 121.71, 152.21], brillo: 3.74, mate: 7.07, ppvs: 10.81 },
+            { size: "30X30", w: 30, h: 30, prices: [16.42, 21.23, 21.43, 31.63, 36.34, 40.73, 50.05, 60.19, 70.33, 77.71, 85.01, 100.19, 119.15, 149.25], brillo: 3.30, mate: 6.11, ppvs: 10.34 },
+            { size: "30X36", w: 30, h: 36, prices: [18.43, 22.72, 25.71, 33.76, 39.96, 47.10, 56.07, 65.95, 75.86, 84.21, 93.27, 109.07, 130.82, 163.62], brillo: 3.74, mate: 7.07, ppvs: 10.81 },
+            { size: "30X40", w: 30, h: 40, prices: [19.62, 24.02, 27.88, 35.63, 42.20, 49.66, 59.05, 69.38, 79.69, 88.59, 97.04, 114.11, 136.93, 171.29], brillo: 4.11, mate: 7.73, ppvs: 11.84 },
+            { size: "30X42", w: 30, h: 42, prices: [20.61, 24.70, 28.66, 36.64, 43.41, 51.06, 60.75, 71.35, 81.98, 91.16, 99.80, 117.39, 140.83, 176.17], brillo: 4.36, mate: 8.26, ppvs: 12.31 },
+            { size: "30X50", w: 30, h: 50, prices: [26.08, 26.94, 31.27, 41.44, 48.98, 57.70, 67.40, 78.19, 89.01, 101.23, 107.80, 126.79, 152.11, 190.28], brillo: 5.45, mate: 10.44, ppvs: 13.24 },
+            { size: "30X70", w: 30, h: 70, prices: [29.47, 34.73, 39.78, 50.64, 59.58, 67.91, 74.51, 91.10, 107.69, 123.01, 129.29, 152.11, 182.47, 228.38], brillo: 8.88, mate: 16.11, ppvs: 15.42 },
+            { size: "30X90", w: 30, h: 90, prices: [35.24, 41.04, 47.53, 60.41, 73.68, 83.92, 93.75, 109.11, 126.50, 146.62, 150.94, 177.50, 219.99, 266.41], brillo: 11.78, mate: 22.49, ppvs: 21.00 },
+            { size: "33X41", w: 33, h: 41, prices: [22.60, 25.25, 29.93, 38.14, 45.24, 54.04, 63.04, 75.93, 84.33, 95.28, 102.40, 120.45, 144.50, 180.78], brillo: 6.70, mate: 12.65, ppvs: 12.93 },
+            { size: "35X40", w: 35, h: 40, prices: [22.61, 25.25, 29.93, 38.16, 45.23, 54.03, 63.04, 75.92, 84.33, 95.28, 102.40, 120.45, 144.50, 180.78], brillo: 6.70, mate: 12.65, ppvs: 12.93 },
+            { size: "35X50", w: 35, h: 50, prices: [25.61, 28.67, 33.32, 44.00, 51.93, 59.51, 71.43, 82.79, 93.69, 103.64, 113.20, 133.13, 159.69, 199.77], brillo: 6.73, mate: 12.84, ppvs: 13.33 },
+            { size: "38X46", w: 38, h: 46, prices: [25.61, 28.66, 33.33, 44.00, 51.95, 59.50, 71.44, 82.79, 93.69, 103.64, 113.20, 133.13, 159.69, 199.77], brillo: 7.17, mate: 14.95, ppvs: 14.33 },
+            { size: "40X50", w: 40, h: 50, prices: [26.58, 31.23, 36.25, 46.63, 54.71, 64.41, 75.53, 90.36, 98.37, 108.65, 118.56, 139.43, 167.29, 209.29], brillo: 7.17, mate: 14.95, ppvs: 14.33 },
+            { size: "40X60", w: 40, h: 60, prices: [29.47, 34.73, 39.78, 50.64, 59.58, 67.91, 74.51, 91.10, 107.69, 123.01, 129.29, 152.11, 182.47, 228.38], brillo: 8.88, mate: 16.11, ppvs: 15.42 },
+            { size: "40X70", w: 40, h: 70, prices: [32.35, 37.72, 43.71, 55.61, 65.82, 77.40, 85.44, 107.30, 117.18, 131.71, 140.18, 164.89, 197.79, 247.33], brillo: 10.09, mate: 19.35, ppvs: 17.95 },
+            { size: "40X90", w: 40, h: 90, prices: [45.19, 47.50, 54.93, 69.82, 77.29, 93.30, 102.50, 113.53, 135.85, 147.93, 161.70, 190.18, 228.15, 285.43], brillo: 14.02, mate: 26.79, ppvs: 24.14 },
+            { size: "45X55", w: 45, h: 55, prices: [29.47, 34.73, 39.78, 50.64, 59.58, 67.91, 74.51, 91.10, 107.69, 123.01, 129.29, 152.11, 182.47, 228.38], brillo: 8.88, mate: 16.11, ppvs: 15.42 },
+            { size: "50X60", w: 50, h: 60, prices: [32.35, 37.72, 43.71, 55.61, 70.87, 77.40, 85.47, 98.18, 117.18, 130.04, 140.18, 164.89, 197.79, 247.33], brillo: 10.09, mate: 19.35, ppvs: 17.95 },
+            { size: "55X65", w: 55, h: 65, prices: [35.24, 41.04, 47.53, 60.41, 73.68, 83.92, 97.29, 109.11, 126.50, 139.59, 150.94, 177.50, 216.48, 266.41], brillo: 11.78, mate: 22.49, ppvs: 21.00 },
+            { size: "50X70", w: 50, h: 70, prices: [35.24, 41.04, 47.53, 60.41, 73.68, 83.92, 97.29, 109.11, 126.50, 139.59, 150.94, 177.50, 216.48, 266.41], brillo: 11.78, mate: 22.49, ppvs: 21.00 },
+            { size: "50X100", w: 50, h: 100, prices: [48.36, 54.68, 63.26, 76.93, 86.99, 100.48, 111.19, 134.12, 154.53, 171.81, 183.19, 215.50, 258.55, 323.50], brillo: 18.23, mate: 36.30, ppvs: 30.38 },
+            { size: "60X73", w: 60, h: 73, prices: [42.13, 48.61, 56.17, 71.41, 81.55, 92.25, 103.83, 122.21, 137.92, 152.11, 163.81, 192.68, 231.04, 289.20], brillo: 16.17, mate: 30.84, ppvs: 25.73 },
+            { size: "60X80", w: 60, h: 80, prices: [44.36, 51.18, 59.11, 75.16, 85.84, 97.09, 109.28, 128.67, 145.18, 161.31, 172.46, 202.82, 243.33, 304.42], brillo: 16.17, mate: 30.84, ppvs: 25.73 },
+            { size: "60X90", w: 60, h: 90, prices: [52.33, 54.68, 63.26, 76.93, 86.99, 100.48, 111.19, 134.12, 154.53, 171.81, 183.19, 215.50, 258.55, 323.50], brillo: 18.23, mate: 36.30, ppvs: 30.38 },
+            { size: "70X100", w: 70, h: 100, prices: [58.79, 71.12, 78.69, 91.75, 104.37, 114.98, 124.99, 148.55, 173.34, 194.28, 204.84, 240.93, 278.44, 361.60], brillo: 23.68, mate: 40.81, ppvs: 36.61 },
+            { size: "80X100", w: 80, h: 100, prices: [62.25, 75.38, 87.10, 102.86, 115.70, 127.82, 142.68, 161.08, 182.70, 199.70, 215.60, 253.54, 297.17, 380.55], brillo: 27.26, mate: 51.87, ppvs: 38.79 },
+            { size: "90X100", w: 90, h: 100, prices: [62.25, 75.38, 87.10, 102.86, 115.70, 127.82, 142.68, 161.08, 182.70, 199.70, 215.60, 253.54, 304.22, 380.55], brillo: 27.26, mate: 51.87, ppvs: 38.79 },
+            { size: "90X110", w: 90, h: 110, prices: [76.93, 96.98, 110.68, 135.28, 146.68, 155.98, 172.22, 182.59, 204.91, 228.03, 237.09, 278.90, 327.53, 418.62], brillo: 36.36, mate: 69.51, ppvs: 43.12 },
+            { size: "100X100", w: 100, h: 100, prices: [76.93, 96.98, 110.68, 135.28, 146.68, 155.98, 172.22, 182.59, 204.91, 228.03, 237.09, 278.90, 327.53, 418.62], brillo: 36.36, mate: 69.51, ppvs: 43.12 },
+            { size: "150X52", w: 150, h: 52, prices: [77.69, 97.97, 111.81, 136.61, 148.15, 157.54, 173.96, 184.43, 206.97, 229.17, 239.46, 281.69, 330.81, 424.57], brillo: 36.92, mate: 70.25, ppvs: 44.05 },
+            { size: "120X90", w: 120, h: 90, prices: [82.95, 101.78, 116.17, 145.05, 158.29, 169.44, 184.43, 195.11, 210.86, 235.99, 247.98, 291.64, 339.33, 437.61], brillo: 43.83, mate: 83.62, ppvs: 47.29 },
+            { size: "110X110", w: 110, h: 110, prices: [84.61, 109.89, 121.76, 161.36, 167.20, 179.17, 196.63, 205.73, 220.19, 244.28, 256.30, 304.32, 365.05, 456.72], brillo: 45.17, mate: 91.22, ppvs: 0.00 },
+            { size: "130X90", w: 130, h: 90, prices: [84.61, 109.89, 121.76, 161.36, 167.20, 179.17, 196.63, 205.73, 220.19, 244.28, 256.30, 304.32, 365.05, 456.72], brillo: 45.17, mate: 91.22, ppvs: 49.54 },
+            { size: "130X100", w: 130, h: 100, prices: [88.42, 124.96, 139.52, 163.95, 182.70, 196.34, 208.44, 216.23, 228.92, 247.78, 268.30, 316.96, 380.23, 475.71], brillo: 47.23, mate: 95.40, ppvs: 51.78 },
+            { size: "140X100", w: 140, h: 100, prices: [92.29, 130.38, 145.56, 171.09, 190.64, 204.85, 217.51, 225.61, 238.87, 262.86, 280.26, 329.61, 395.41, 494.69], brillo: 52.22, mate: 105.77, ppvs: 54.02 }
+        ];
+
+        // --- 1.2 BASE DE DATOS DE LAS TARIFAS PVP POR M2 ---
+        const DB_M2 = {
+            cortinas: {
+                modelos: [
+                    { id: "canutillo", nombre: "Canutillo", m2: 56.35, info: "Modelo Canutillo clásico" },
+                    { id: "miami", nombre: "Miami", m2: 90.90, info: "Miami acabado liso" },
+                    { id: "cadena_alum_a", nombre: "Cadena Aluminio - Serie 200 (Colores A)", m2: 100.45, info: "Rojo, Amarillo, Verde, Azul, Blanco y Marrón" },
+                    { id: "cadena_alum_b", nombre: "Cadena Aluminio - Serie 200 (Colores B)", m2: 112.50, info: "Negro, Gris, Naranja" },
+                    { id: "cadena_alum_ab", nombre: "Cadena Aluminio - Serie 200 (Combinada A y B)", m2: 112.50, info: "Mezcla de tonalidades A y B" },
+                    { id: "cinta_opaca_300", nombre: "Cinta Plástico Opaca - Serie 300", m2: 40.85, info: "Serie 300" },
+                    { id: "cinta_transp_330", nombre: "Cinta Plástico Transparente - Serie 330", m2: 40.85, info: "Serie 330" },
+                    { id: "cinta_plast_350", nombre: "Cinta Plástico - Serie 350", m2: 40.85, info: "Serie 350" },
+                    { id: "cinta_transp_360", nombre: "Cinta Plástico Transparente - Serie 360", m2: 43.25, info: "Serie 360" },
+                    { id: "cinta_opaca_370", nombre: "Cinta Plástico Opaca - Serie 370", m2: 43.25, info: "Serie 370" },
+                    { id: "cinta_plast_380", nombre: "Cinta Plástico - Serie 380", m2: 44.95, info: "Serie 380" },
+                    { id: "florida_opaca_400", nombre: "Florida Opaca - Serie 400", m2: 67.25, info: "Serie 400" },
+                    { id: "florida_trans_430", nombre: "Florida Transparente - Serie 430", m2: 67.25, info: "Serie 430" },
+                    { id: "florida_metal_450", text: "Florida Metalizado - Serie 450", m2: 67.25, info: "Serie 450" },
+                    { id: "primavera_470", nombre: "Primavera - Serie 470", m2: 64.75, info: "Serie 470" },
+                    { id: "marina_480", nombre: "Marina - Serie 480", m2: 64.75, info: "Serie 480" },
+                    { id: "cantabria_490", nombre: "Cantabria - Serie 490", m2: 66.45, info: "Serie 490" },
+                    { id: "formentera_550", nombre: "Formentera - Serie 550", m2: 72.65, info: "Serie 550" },
+                    { id: "menorca_560", nombre: "Menorca - Serie 560", m2: 72.65, info: "Serie 560" },
+                    { id: "palma_570", nombre: "Palma - Serie 570", m2: 79.60, info: "Serie 570" },
+                    { id: "inca_580", nombre: "Inca - Serie 580", m2: 68.80, info: "Serie 580" },
+                    { id: "cadaques_590", nombre: "Cadaqués - Serie 590", m2: 74.85, info: "Serie 590" },
+                    { id: "ibiza_600", nombre: "Ibiza - Serie 600", m2: 72.65, info: "Serie 600" },
+                    { id: "manacor_700", nombre: "Manacor - Serie 700", m2: 72.65, info: "Serie 700" },
+                    { id: "verona_750", nombre: "Verona - Serie 750", m2: 72.65, info: "Serie 750" },
+                    { id: "mallorca_800", nombre: "Mallorca - Serie 800", m2: 68.80, info: "Serie 800" },
+                    { id: "bolonia_900", nombre: "Bolonia - Serie 900", m2: 65.60, info: "Serie 900" }
+                ]
+            },
+            persianas: {
+                modelos: [
+                    { id: "ali_plastico", nombre: "Alicantina Plástico", m2: 55.60, info: "Marrón, Marfil, Verde, Blanca, Nogal y Gris" },
+                    { id: "ali_mad_natural", nombre: "Alicantina Madera Natural", m2: 64.50, info: "Madera de pino sin barnizar" },
+                    { id: "ali_mad_barnizada", nombre: "Alicantina Madera Natural Barnizada", m2: 67.30, info: "Barnizado brillo protector" },
+                    { id: "ali_mad_pintada", nombre: "Alicantina Madera Pintada", m2: 67.30, info: "Pintada Nogal, Castaño o Verde" }
+                ]
+            },
+            // Estores de madera digitalizados de la hoja de tarifas
+            estores: {
+                modelos: [
+                    { id: "estor_3606", nombre: "Estor de Madera Serie 3606 - Natural", m2: 67.45, info: "Madera Natural" },
+                    { id: "estor_3643", nombre: "Estor de Madera Serie 3643 - Natural Okume", m2: 67.45, info: "Natural Okume" },
+                    { id: "estor_362",  nombre: "Estor de Madera Serie 362 - Chamois", m2: 87.85, info: "Tono Chamois" },
+                    { id: "estor_3646", nombre: "Estor de Madera Serie 3646 - Blanco", m2: 87.85, info: "Blanco lacado" },
+                    { id: "estor_3692", nombre: "Estor de Madera Serie 3692 - Gris", m2: 87.85, info: "Tono Gris" }
+                ]
+            }
+        };
+
+        // --- 1.3 TARIFAS DE CONSUMIBLES MARCOS ---
+        const DB_CONSUMIBLES = {
+            espejo_3_2: { nombre: "Espejo 3 mm", precioM2: 69.98 },
+            espejo_4_2: { nombre: "Espejo 4 mm", precioM2: 85.27 },
+            canto_pulido_metro: 8.13, 
+            dm_2_5: { nombre: "Trasera DM 2,5 mm", precioM2: 10.05 },
+            dm_4: { nombre: "Trasera DM 4 mm", precioM2: 19.66 },
+            grapas_grandes: 0.78, 
+            grapas_pequenas: 0.45, 
+            arraglass: { nombre: "PS Arraglass 1,5 mm", precioM2: 49.15 },
+            arrasol: { font_name: "Arrasol 2 mm", precioM2: 64.78 }
+        };
+
+        // --- 2. CONFIGURACIÓN DE LAS CATEGORÍAS ---
+        const CATEGORIAS = {
+            mosquiteras: {
+                nombre: "Mosquiteras",
+                icono: "calculator",
+                colorClase: "bg-emerald-600",
+                colorFondo: "bg-emerald-50 text-emerald-900",
+                configurado: true,
+                tipoCalculo: "matricial",
+                defaultModel: "enrollable_vert",
+                modelos: [
+                    { id: "enrollable_vert", nombre: "Enrollable Vertical" },
+                    { id: "enrollable_lat", nombre: "Enrollable Lateral (1 Hoja)" },
+                    { id: "corredera_curva", nombre: "Corredera Curva" },
+                    { id: "fija", nombre: "Fija" },
+                    { id: "puerta_practicable", nombre: "Puerta Practicable" }
+                ]
+            },
+            cortinas: {
+                nombre: "Cortinas de puerta",
+                icono: "door-open",
+                colorClase: "bg-indigo-600",
+                colorFondo: "bg-indigo-50 text-indigo-900",
+                configurado: true,
+                tipoCalculo: "m2",
+                defaultModel: "canutillo",
+                modelos: DB_M2.cortinas.modelos
+            },
+            persianas: {
+                nombre: "Persianas",
+                icono: "chevrons-down",
+                colorClase: "bg-amber-600",
+                colorFondo: "bg-amber-50 text-amber-900",
+                configurado: true,
+                tipoCalculo: "m2",
+                defaultModel: "ali_plastico",
+                modelos: DB_M2.persianas.modelos
+            },
+            estores: {
+                nombre: "Estores de Madera",
+                icono: "unfold-vertical",
+                colorClase: "bg-teal-600",
+                colorFondo: "bg-teal-50 text-teal-900",
+                configurado: true,
+                tipoCalculo: "m2",
+                defaultModel: "estor_3606",
+                modelos: DB_M2.estores.modelos
+            },
+            marcos: {
+                nombre: "Marcos",
+                icono: "frame",
+                colorClase: "bg-rose-600",
+                colorFondo: "bg-rose-50 text-rose-900",
+                configurado: true, 
+                tipoCalculo: "matricial",
+                defaultModel: "marco_1",
+                modelos: Array.from({length: 14}, (_, i) => ({ id: `marco_${i+1}`, nombre: `Moldura ${i+1}` }))
+            },
+            alfombras: {
+                nombre: "Alfombras",
+                icono: "layers",
+                colorClase: "bg-cyan-600",
+                colorFondo: "bg-cyan-50 text-cyan-900",
+                configurado: false,
+                tipoCalculo: "matricial",
+                defaultModel: "",
+                modelos: []
+            }
+        };
+
+        // --- 3. VARIABLES DE ESTADO Y PRESUPUESTOS INDEPENDIENTES ---
+        let currentCategory = "home";
+        let selectedProduct = "enrollable_vert";
+        let selectedColor = "blanco";
+        let activePrice = 0;
+        let activeMatchedSize = "";
+        
+        let activeConsumibles = {
+            espejoId: "ninguno",
+            cantoPulido: "no",
+            traseraId: "ninguno",
+            grapasGrandes: 0,
+            grapasPequenas: 0,
+            plasticosId: "ninguno",
+            desglose: {}
+        };
+
+        // Estructura de presupuestos separados por categoría
+        let budgets = {
+            mosquiteras: [],
+            cortinas: [],
+            persianas: [],
+            estores: [],
+            marcos: [],
+            alfombras: []
+        };
+
+        // Inicializador
+        window.onload = function() {
+            safeCreateIcons();
+            loadAllBudgets(); 
+            goToHome(); 
+            document.getElementById('print-date').textContent = new Date().toLocaleDateString('es-ES');
+        };
+
+        function safeCreateIcons() {
+            try {
+                if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.warn("Lucide Icons no se pudo cargar.", e);
+            }
+        }
+
+        const safeStorage = {
+            getItem: function(key) {
+                try { return localStorage.getItem(key); } catch (e) { return null; }
+            },
+            setItem: function(key, value) {
+                try { localStorage.setItem(key, value); } catch (e) {}
+            }
+        };
+
+        // --- 4. SISTEMA DE NAVEGACIÓN ---
+        function goToHome() {
+            currentCategory = "home";
+            document.getElementById('panel-home').classList.remove('hidden');
+            document.getElementById('panel-tarificador').classList.add('hidden');
+            
+            resetNavActiveClasses();
+            document.getElementById('nav-home').classList.add('bg-slate-700', 'text-white');
+            safeCreateIcons();
+        }
+
+        function switchCategory(catId) {
+            currentCategory = catId;
+            const catInfo = CATEGORIAS[catId];
+            
+            document.getElementById('panel-home').classList.add('hidden');
+            document.getElementById('panel-tarificador').classList.remove('hidden');
+
+            resetNavActiveClasses();
+            const activeNavBtn = document.getElementById(`nav-${catId}`);
+            if (activeNavBtn) {
+                activeNavBtn.classList.add('bg-slate-700', 'text-white');
+            }
+
+            document.getElementById('category-active-title').textContent = catInfo.nombre;
+            
+            const badgeIcon = document.getElementById('category-badge-icon');
+            badgeIcon.className = `p-1.5 rounded-lg text-white ${catInfo.colorClase}`;
+            badgeIcon.innerHTML = `<i data-lucide="${catInfo.icono}" class="w-5 h-5"></i>`;
+
+            const fieldsContainer = document.getElementById('calculator-fields');
+            const placeholderContainer = document.getElementById('calculator-placeholder');
+            const matrixPanel = document.getElementById('panel-matrix-container');
+            const priceCard = document.getElementById('price-result-card');
+            
+            const tableStandard = document.getElementById('table-standard-wrapper');
+            const m2Alternative = document.getElementById('m2-alternative-wrapper');
+            const consumiblesWrapper = document.getElementById('consumibles-wrapper');
+            const priceBreakdown = document.getElementById('price-breakdown-wrapper');
+
+            document.getElementById('input-ancho').value = "";
+            document.getElementById('input-alto').value = "";
+            
+            resetConsumiblesForm();
+
+            if (catInfo.configurado) {
+                fieldsContainer.classList.remove('hidden');
+                matrixPanel.classList.remove('hidden');
+                priceCard.classList.remove('hidden');
+                placeholderContainer.classList.add('hidden');
+
+                const selectTipo = document.getElementById('select-tipo');
+                selectTipo.innerHTML = "";
+                catInfo.modelos.forEach(mod => {
+                    const opt = document.createElement('option');
+                    opt.value = mod.id;
+                    opt.textContent = mod.nombre;
+                    selectTipo.appendChild(opt);
+                });
+
+                selectedProduct = catInfo.defaultModel;
+                selectTipo.value = selectedProduct;
+
+                if (catInfo.tipoCalculo === "matricial") {
+                    tableStandard.classList.remove('hidden');
+                    m2Alternative.classList.add('hidden');
+                    
+                    if (catId === "marcos") {
+                        document.getElementById('color-selection-wrapper').classList.add('hidden');
+                        document.getElementById('cristal-selection-wrapper').classList.remove('hidden');
+                        document.getElementById('select-cristal').value = "no";
+                        consumiblesWrapper.classList.remove('hidden');
+                        priceBreakdown.classList.remove('hidden');
+                        document.getElementById('panel-matrix-title-text').textContent = "Tabla Catálogo de Marcos 2025";
+                    } else {
+                        document.getElementById('color-selection-wrapper').classList.remove('hidden');
+                        document.getElementById('cristal-selection-wrapper').classList.add('hidden');
+                        consumiblesWrapper.classList.add('hidden');
+                        priceBreakdown.classList.add('hidden');
+                        document.getElementById('panel-matrix-title-text').textContent = "Matriz de Tarifas Activa";
+                    }
+
+                    document.getElementById('panel-matrix-dimension-label').classList.remove('hidden');
+                    document.getElementById('matched-size-row').classList.remove('hidden');
+                    document.getElementById('m2-calculated-row').classList.add('hidden');
+                } else {
+                    // M2 (Cortinas, Persianas, Estores)
+                    tableStandard.classList.add('hidden');
+                    m2Alternative.classList.remove('hidden');
+                    document.getElementById('color-selection-wrapper').classList.add('hidden');
+                    document.getElementById('cristal-selection-wrapper').classList.add('hidden');
+                    consumiblesWrapper.classList.add('hidden');
+                    priceBreakdown.classList.add('hidden');
+                    document.getElementById('panel-matrix-title-text').textContent = "Precios Confección M²";
+                    document.getElementById('panel-matrix-dimension-label').classList.add('hidden');
+                    document.getElementById('matched-size-row').classList.add('hidden');
+                    document.getElementById('m2-calculated-row').classList.remove('hidden');
+                    renderM2RatesList();
+                }
+
+                document.getElementById('budget-category-title').textContent = `Presupuesto: ${catInfo.nombre}`;
+                document.getElementById('budget-sum-label').textContent = `Total Neto Sección ${catInfo.nombre}`;
+
+                onProductChange();
+            } else {
+                fieldsContainer.classList.add('hidden');
+                matrixPanel.classList.add('hidden');
+                priceCard.classList.add('hidden');
+                placeholderContainer.classList.remove('hidden');
+                
+                activePrice = 0;
+                activeMatchedSize = "";
+                document.getElementById('matrix-table').innerHTML = "";
+            }
+
+            renderBudget();
+            safeCreateIcons();
+        }
+
+        function resetNavActiveClasses() {
+            const navs = ['nav-home', 'nav-mosquiteras', 'nav-cortinas', 'nav-persianas', 'nav-estores', 'nav-marcos', 'nav-alfombras'];
+            navs.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.classList.remove('bg-slate-700', 'text-white');
+                }
+            });
+        }
+
+        function resetConsumiblesForm() {
+            const selectEspejo = document.getElementById('select-espejo');
+            const selectCanto = document.getElementById('select-canto-pulido');
+            const selectTrasera = document.getElementById('select-trasera-dm');
+            const inputGGrandes = document.getElementById('input-grapas-grandes');
+            const inputGPequenas = document.getElementById('input-grapas-pequenas');
+            const selectPlast = document.getElementById('select-plasticos');
+
+            if (selectEspejo) selectEspejo.value = "ninguno";
+            if (selectCanto) {
+                selectCanto.value = "no";
+                selectCanto.disabled = true;
+                selectCanto.className = "w-full rounded-xl border border-slate-200 px-3 py-2 bg-slate-100 text-slate-400 text-xs font-medium cursor-pointer disabled:opacity-50";
+            }
+            if (selectTrasera) selectTrasera.value = "ninguno";
+            if (inputGGrandes) inputGGrandes.value = "0";
+            if (inputGPequenas) inputGPequenas.value = "0";
+            if (selectPlast) selectPlast.value = "ninguno";
+
+            activeConsumibles = {
+                espejoId: "ninguno",
+                cantoPulido: "no",
+                traseraId: "ninguno",
+                grapasGrandes: 0,
+                grapasPequenas: 0,
+                plasticosId: "ninguno",
+                desglose: {
+                    baseMarco: 0,
+                    cristal: 0,
+                    espejo: 0,
+                    canto: 0,
+                    trasera: 0,
+                    grapas: 0,
+                    plasticos: 0
+                }
+            };
+        }
+
+        // --- 5. LOGICA DEL BUSCADOR ---
+        function onProductChange() {
+            if (!CATEGORIAS[currentCategory].configurado) return;
+
+            selectedProduct = document.getElementById('select-tipo').value;
+
+            if (CATEGORIAS[currentCategory].tipoCalculo === "matricial") {
+                if (currentCategory === "mosquiteras") {
+                    const product = DB_TARIFAS[selectedProduct];
+                    document.getElementById('color-selection-wrapper').classList.remove('hidden');
+                    const containerColor = document.getElementById('color-swatches');
+                    containerColor.innerHTML = "";
+
+                    product.colores.forEach((col, idx) => {
+                        if (idx === 0) selectedColor = col.id;
+
+                        const btn = document.createElement('button');
+                        btn.id = `btn-color-${col.id}`;
+                        btn.type = "button";
+                        btn.onclick = () => selectColor(col.id);
+                        btn.textContent = col.nombre;
+                        btn.className = `p-2.5 border text-xs font-semibold rounded-xl text-center transition-all duration-200 cursor-pointer ${
+                            idx === 0 
+                            ? 'border-emerald-600 bg-emerald-50 text-emerald-900 shadow-sm' 
+                            : 'border-slate-200 hover:bg-slate-50 text-slate-700 bg-white'
+                        }`;
+                        containerColor.appendChild(btn);
+                    });
+                } else if (currentCategory === "marcos") {
+                    selectedColor = "estandar";
+                }
+
+                renderMatrixTable();
+            } else {
+                highlightM2RateListItem(selectedProduct);
+            }
+            
+            calculatePrice();
+        }
+
+        function selectColor(colorId) {
+            selectedColor = colorId;
+            const product = DB_TARIFAS[selectedProduct];
+            product.colores.forEach(col => {
+                const btn = document.getElementById(`btn-color-${col.id}`);
+                if (btn) {
+                    if (col.id === colorId) {
+                        btn.className = "p-2.5 border text-xs font-semibold rounded-xl text-center transition-all duration-200 border-emerald-600 bg-emerald-50 text-emerald-900 shadow-sm cursor-pointer";
+                    } else {
+                        btn.className = "p-2.5 border text-xs font-semibold rounded-xl text-center transition-all duration-200 border-slate-200 hover:bg-slate-50 text-slate-700 bg-white cursor-pointer";
+                    }
+                }
+            });
+
+            renderMatrixTable();
+            calculatePrice();
+        }
+
+        function onCristalChange() {
+            renderMatrixTable();
+            calculatePrice();
+        }
+
+        function onConsumibleChange() {
+            const selectEspejo = document.getElementById('select-espejo');
+            const selectCanto = document.getElementById('select-canto-pulido');
+            const selectTrasera = document.getElementById('select-trasera-dm');
+            const inputGGrandes = document.getElementById('input-grapas-grandes');
+            const inputGPequenas = document.getElementById('input-grapas-pequenas');
+            const selectPlast = document.getElementById('select-plasticos');
+
+            if (selectEspejo.value === "ninguno") {
+                selectCanto.value = "no";
+                selectCanto.disabled = true;
+                selectCanto.className = "w-full rounded-xl border border-slate-200 px-3 py-2 bg-slate-100 text-slate-400 text-xs font-medium cursor-pointer disabled:opacity-50";
+            } else {
+                selectCanto.disabled = false;
+                selectCanto.className = "w-full rounded-xl border border-rose-300 px-3 py-2 bg-rose-50/20 text-xs font-medium text-slate-800 cursor-pointer";
+            }
+
+            activeConsumibles.espejoId = selectEspejo.value;
+            activeConsumibles.cantoPulido = selectCanto.value;
+            activeConsumibles.traseraId = selectTrasera.value;
+            activeConsumibles.grapasGrandes = Math.max(0, parseInt(inputGGrandes.value) || 0);
+            activeConsumibles.grapasPequenas = Math.max(0, parseInt(inputGPequenas.value) || 0);
+            activeConsumibles.plasticosId = selectPlast.value;
+
+            calculatePrice();
+        }
+
+        // --- 5.2 RENDER LISTADO M2 Y MAPA DE PROPORCIONES ---
+        function renderM2RatesList() {
+            const container = document.getElementById('m2-rates-tbody');
+            const categoryData = DB_M2[currentCategory];
+            if (!categoryData) return;
+
+            let html = "";
+            categoryData.modelos.forEach(mod => {
+                html += `
+                    <tr id="m2-row-${mod.id}" class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition text-xs" onclick="selectM2ModelViaTable('${mod.id}')">
+                        <td class="p-3 font-semibold text-slate-800">
+                            <div>${mod.nombre}</div>
+                            <div class="text-[10px] text-slate-400 font-normal">${mod.info}</div>
+                        </td>
+                        <td class="p-3 text-right font-bold text-slate-900 font-mono">${mod.m2.toFixed(2)} €</td>
+                    </tr>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function selectM2ModelViaTable(modelId) {
+            document.getElementById('select-tipo').value = modelId;
+            onProductChange();
+        }
+
+        function highlightM2RateListItem(modelId) {
+            const categoryData = DB_M2[currentCategory];
+            if (!categoryData) return;
+
+            categoryData.modelos.forEach(mod => {
+                const row = document.getElementById(`m2-row-${mod.id}`);
+                if (row) {
+                    if (mod.id === modelId) {
+                        if (currentCategory === "estores") {
+                            row.className = "border-b border-teal-200 bg-teal-50 hover:bg-teal-100 font-bold text-teal-900 transition text-xs";
+                        } else {
+                            row.className = "border-b border-indigo-200 bg-indigo-50 hover:bg-indigo-100 font-bold text-indigo-900 transition text-xs";
+                        }
+                    } else {
+                        row.className = "border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition text-xs text-slate-700";
+                    }
+                }
+            });
+        }
+
+        function updateAreaScalerVisual(w, h, m2, isMinApplied) {
+            const visualBox = document.getElementById('visual-scaled-box');
+            const visualTxt = document.getElementById('visual-scaled-txt');
+            const visualW = document.getElementById('visual-scaled-w');
+            const visualH = document.getElementById('visual-scaled-h');
+
+            if (isNaN(w) || isNaN(h) || w <= 0 || h <= 0) {
+                visualBox.className = "bg-slate-100 border-2 border-slate-300 rounded-lg flex items-center justify-center text-slate-900 font-bold text-xs shadow-inner transition-all duration-300 relative";
+                visualBox.style.width = "100px";
+                visualBox.style.height = "100px";
+                visualTxt.textContent = "0.00 m²";
+                visualW.textContent = "0cm";
+                visualH.textContent = "0cm";
+                return;
+            }
+
+            const maxPixel = 160;
+            const minPixel = 50;
+            const ratio = w / h;
+
+            let finalW = 100;
+            let finalH = 100;
+
+            if (ratio >= 1) {
+                finalW = maxPixel;
+                finalH = Math.max(minPixel, Math.round(maxPixel / ratio));
+            } else {
+                finalH = maxPixel;
+                finalW = Math.max(minPixel, Math.round(maxPixel * ratio));
+            }
+
+            visualBox.style.width = `${finalW}px`;
+            visualBox.style.height = `${finalH}px`;
+            
+            // Adaptar colores de caja según categoría
+            if (currentCategory === "estores") {
+                visualBox.className = "bg-teal-100 border-2 border-teal-400 rounded-lg flex items-center justify-center text-teal-900 font-bold text-xs shadow-inner transition-all duration-300 relative";
+            } else if (currentCategory === "persianas") {
+                visualBox.className = "bg-amber-100 border-2 border-amber-400 rounded-lg flex items-center justify-center text-amber-900 font-bold text-xs shadow-inner transition-all duration-300 relative";
+            } else {
+                visualBox.className = "bg-indigo-100 border-2 border-indigo-400 rounded-lg flex items-center justify-center text-indigo-900 font-bold text-xs shadow-inner transition-all duration-300 relative";
+            }
+            
+            visualTxt.innerHTML = `${m2.toFixed(3)} m² ${isMinApplied ? '<span class="block text-[8px] bg-indigo-200 px-1 py-0.5 rounded text-indigo-950 mt-1">MÍNIMO</span>' : ''}`;
+            visualW.textContent = `${w} cm`;
+            visualH.textContent = `${h} cm`;
+        }
+
+        function findMatchingStandardMarco(wUser, hUser) {
+            const uMin = Math.min(wUser, hUser);
+            const uMax = Math.max(wUser, hUser);
+
+            for (let i = 0; i < MARCOS_STANDARD_DB.length; i++) {
+                const standard = MARCOS_STANDARD_DB[i];
+                const sMin = Math.min(standard.w, standard.h);
+                const sMax = Math.max(standard.w, standard.h);
+
+                if (uMin <= sMin && uMax <= sMax) {
+                    return { index: i, ...standard };
+                }
+            }
+            return null;
+        }
+
+        // --- 5.3 CÁLCULO CORE DE PRECIOS ---
+        function calculatePrice() {
+            if (!CATEGORIAS[currentCategory].configurado) return;
+
+            const anchoInput = parseFloat(document.getElementById('input-ancho').value);
+            const altoInput = parseFloat(document.getElementById('input-alto').value);
+
+            const displayPrice = document.getElementById('display-price');
+            const displayMatched = document.getElementById('display-matched-size');
+            const displayM2Calc = document.getElementById('display-m2-calc');
+            const displayLimit = document.getElementById('display-limit');
+            const colorLabel = document.getElementById('label-color-selected');
+            const warningBox = document.getElementById('calculator-warning');
+            const warningText = document.getElementById('warning-text');
+            const warningTitle = document.getElementById('warning-title');
+
+            warningBox.classList.add('hidden');
+            clearHighlights();
+
+            if (isNaN(anchoInput) || isNaN(altoInput) || anchoInput <= 0 || altoInput <= 0) {
+                displayPrice.textContent = "0,00";
+                if (displayMatched) displayMatched.textContent = "-";
+                if (displayM2Calc) displayM2Calc.textContent = "-";
+                displayLimit.textContent = "-";
+                activePrice = 0;
+                activeMatchedSize = "";
+                updateAreaScalerVisual(0, 0, 0, false);
+                togglePriceBreakdown(false);
+                return;
+            }
+
+            const tipoCalculo = CATEGORIAS[currentCategory].tipoCalculo;
+
+            if (currentCategory === "marcos") {
+                const molduraId = selectedProduct;
+                const molduraIndex = parseInt(molduraId.split('_')[1]) - 1;
+                const cristalSelected = document.getElementById('select-cristal').value;
+
+                const cristalLabels = {
+                    no: "Solo Marco",
+                    c_brillo: "Cristal Brillo",
+                    c_mate: "Cristal Mate",
+                    pp_vs: "PP VS"
+                };
+                colorLabel.textContent = cristalLabels[cristalSelected];
+
+                const match = findMatchingStandardMarco(anchoInput, altoInput);
+
+                if (match) {
+                    const basePrice = match.prices[molduraIndex];
+                    
+                    let glassCost = 0;
+                    if (cristalSelected === "c_brillo") glassCost = match.brillo;
+                    else if (cristalSelected === "c_mate") glassCost = match.mate;
+                    else if (cristalSelected === "pp_vs") glassCost = match.ppvs;
+
+                    const areaM2 = (anchoInput * altoInput) / 10000;
+                    
+                    let espejoCost = 0;
+                    if (activeConsumibles.espejoId !== "ninguno") {
+                        const espejoObj = DB_CONSUMIBLES[activeConsumibles.espejoId];
+                        if (espejoObj) espejoCost = areaM2 * espejoObj.precioM2;
+                    }
+
+                    let cantoCost = 0;
+                    if (activeConsumibles.espejoId !== "ninguno" && activeConsumibles.cantoPulido === "si") {
+                        const wRounded = Math.ceil(anchoInput / 10) * 10;
+                        const hRounded = Math.ceil(altoInput / 10) * 10;
+                        const metrosLineales = (2 * (wRounded + hRounded)) / 100;
+                        cantoCost = metrosLineales * DB_CONSUMIBLES.canto_pulido_metro;
+                    }
+
+                    let traseraCost = 0;
+                    if (activeConsumibles.traseraId !== "ninguno") {
+                        const traseraObj = DB_CONSUMIBLES[activeConsumibles.traseraId];
+                        if (traseraObj) traseraCost = areaM2 * traseraObj.precioM2;
+                    }
+
+                    const grapasGrandesCost = activeConsumibles.grapasGrandes * DB_CONSUMIBLES.grapas_grandes;
+                    const grapasPequenasCost = activeConsumibles.grapasPequenas * DB_CONSUMIBLES.grapas_pequenas;
+                    const totalGrapasCost = grapasGrandesCost + grapasPequenasCost;
+
+                    let plasticosCost = 0;
+                    if (activeConsumibles.plasticosId !== "ninguno") {
+                        const plastObj = DB_CONSUMIBLES[activeConsumibles.plasticosId];
+                        if (plastObj) plasticosCost = areaM2 * plastObj.precioM2;
+                    }
+
+                    const finalPrice = basePrice + glassCost + espejoCost + cantoCost + traseraCost + totalGrapasCost + plasticosCost;
+                    activePrice = finalPrice;
+                    activeMatchedSize = match.size;
+
+                    activeConsumibles.desglose = {
+                        baseMarco: basePrice,
+                        cristal: glassCost,
+                        espejo: espejoCost,
+                        canto: cantoCost,
+                        trasera: traseraCost,
+                        grapas: totalGrapasCost,
+                        plasticos: plasticosCost
+                    };
+
+                    displayPrice.textContent = finalPrice.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    displayMatched.textContent = `${match.size} cm`;
+                    displayLimit.textContent = "Medida Catálogo Oficial Pinturas 807";
+
+                    updatePriceBreakdownUI(activeConsumibles.desglose);
+                    highlightMarcoRow(match.index, cristalSelected);
+
+                } else {
+                    activePrice = 0;
+                    activeMatchedSize = "Fuera de catálogo";
+                    displayPrice.textContent = "---";
+                    displayMatched.textContent = "Excede límites estándar";
+                    displayLimit.textContent = "Ancho/Alto superior a 140x100 cm";
+
+                    warningTitle.textContent = "Dimensiones exceden catálogo estándar";
+                    warningText.textContent = "La pieza es superior al tamaño estándar máximo disponible de 140x100 cm. Por favor, póngase en contacto con administración para un presupuesto de fabricación especial a medida.";
+                    warningBox.classList.remove('hidden');
+                    togglePriceBreakdown(false);
+                }
+
+            } else if (tipoCalculo === "matricial") {
+                // MOSQUITERAS
+                togglePriceBreakdown(false);
+                const product = DB_TARIFAS[selectedProduct];
+                const colorObj = product.colores.find(c => c.id === selectedColor);
+                colorLabel.textContent = colorObj ? colorObj.nombre : "-";
+
+                let widthIdx = product.widths.findIndex(w => anchoInput <= w);
+                let heightIdx = product.heights.findIndex(h => altoInput <= h);
+
+                let outOfBounds = false;
+                let warningMsg = "";
+
+                if (widthIdx === -1) {
+                    widthIdx = product.widths.length - 1;
+                    outOfBounds = true;
+                    warningMsg += `El ancho supera el límite de catálogo (${product.widths[product.widths.length - 1]} cm). `;
+                }
+
+                if (heightIdx === -1) {
+                    heightIdx = product.heights.length - 1;
+                    outOfBounds = true;
+                    warningMsg += `El alto supera el límite de catálogo (${product.heights[product.heights.length - 1]} cm). `;
+                }
+
+                // ADVERTENCIA PERSONALIZADA: Mosquitera Corredera Curva con ancho mayor a 190 cm
+                if (selectedProduct === "corredera_curva" && anchoInput > 190) {
+                    warningTitle.textContent = "Recomendación de Estabilidad";
+                    warningText.textContent = "Para un ancho mayor a 190 cm, es recomendable fabricar la mosquitera corredera en 2 hojas para evitar que haga efecto vela y garantizar una mayor estabilidad.";
+                    warningBox.classList.remove('hidden');
+                } else if (outOfBounds) {
+                    warningTitle.textContent = "Medida fuera de catálogo";
+                    warningText.textContent = warningMsg + "Se aplica el precio máximo estándar.";
+                    warningBox.classList.remove('hidden');
+                }
+
+                const price = product.getPrice(widthIdx, heightIdx, selectedColor);
+                activePrice = price;
+                activeMatchedSize = `${product.widths[widthIdx]} x ${product.heights[heightIdx]} cm`;
+
+                displayPrice.textContent = price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                displayMatched.textContent = activeMatchedSize;
+                displayLimit.textContent = `${product.widths[0]}x${product.heights[0]} hasta ${product.widths[product.widths.length-1]}x${product.heights[product.heights.length-1]} cm`;
+
+                highlightCell(widthIdx, heightIdx);
+
+            } else {
+                // CORTINAS, PERSIANAS Y ESTORES DE MADERA (Sin mínimo por M2)
+                togglePriceBreakdown(false);
+                const categoryModels = DB_M2[currentCategory].modelos;
+                const activeModel = categoryModels.find(m => m.id === selectedProduct);
+                
+                if (!activeModel) return;
+                colorLabel.textContent = "Estándar";
+
+                let realArea = (anchoInput / 100) * (altoInput / 100);
+                let billingArea = realArea;
+
+                const finalPrice = billingArea * activeModel.m2;
+                activePrice = finalPrice;
+                activeMatchedSize = `${anchoInput} x ${altoInput} cm`;
+
+                displayPrice.textContent = finalPrice.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                displayM2Calc.textContent = `${realArea.toFixed(3)} m²`;
+                displayLimit.textContent = `Tarifa por M²: ${activeModel.m2.toFixed(2)} €/m²`;
+
+                // Avisos específicos por límites físicos de confección recomendada
+                if (currentCategory === "persianas" && anchoInput > 160) {
+                    warningTitle.textContent = "Nota importante de confección";
+                    warningText.textContent = "La anchura máxima de una persiana alicantina en una sola bajada es de 1,60 Mts. Para anchos superiores se aconseja fabricar con un solo montante pero en dos bajadas.";
+                    warningBox.classList.remove('hidden');
+                } else if (currentCategory === "estores" && anchoInput > 140) {
+                    warningTitle.textContent = "Límite de confección de estores";
+                    warningText.textContent = "La anchura máxima del panel en una sola bajada para estores de madera es de 1,4 Mts. Para anchos superiores se podrá utilizar un solo montante, pero con dos bajadas.";
+                    warningBox.classList.remove('hidden');
+                }
+
+                updateAreaScalerVisual(anchoInput, altoInput, realArea, false);
+            }
+        }
+
+        function togglePriceBreakdown(show) {
+            const wrapper = document.getElementById('price-breakdown-wrapper');
+            if (wrapper) {
+                if (show) wrapper.classList.remove('hidden');
+                else wrapper.classList.add('hidden');
+            }
+        }
+
+        function updatePriceBreakdownUI(desglose) {
+            togglePriceBreakdown(true);
+            
+            const marcoEl = document.getElementById('breakdown-marco');
+            const cristalEl = document.getElementById('breakdown-cristal');
+            const espejoEl = document.getElementById('breakdown-espejo');
+            const cantoEl = document.getElementById('breakdown-canto');
+            const traseraEl = document.getElementById('breakdown-trasera');
+            const grapasEl = document.getElementById('breakdown-grapas');
+            const plasticosEl = document.getElementById('breakdown-plasticos');
+
+            marcoEl.querySelector('span:last-child').textContent = `${desglose.baseMarco.toFixed(2)} €`;
+
+            if (desglose.cristal > 0) {
+                cristalEl.classList.remove('hidden');
+                cristalEl.querySelector('span:last-child').textContent = `${desglose.cristal.toFixed(2)} €`;
+            } else { cristalEl.classList.add('hidden'); }
+
+            if (desglose.espejo > 0) {
+                espejoEl.classList.remove('hidden');
+                espejoEl.querySelector('span:last-child').textContent = `${desglose.espejo.toFixed(2)} €`;
+            } else { espejoEl.classList.add('hidden'); }
+
+            if (desglose.canto > 0) {
+                cantoEl.classList.remove('hidden');
+                cantoEl.querySelector('span:last-child').textContent = `${desglose.canto.toFixed(2)} €`;
+            } else { cantoEl.classList.add('hidden'); }
+
+            if (desglose.trasera > 0) {
+                traseraEl.classList.remove('hidden');
+                traseraEl.querySelector('span:last-child').textContent = `${desglose.trasera.toFixed(2)} €`;
+            } else { traseraEl.classList.add('hidden'); }
+
+            if (desglose.grapas > 0) {
+                grapasEl.classList.remove('hidden');
+                grapasEl.querySelector('span:last-child').textContent = `${desglose.grapas.toFixed(2)} €`;
+            } else { grapasEl.classList.add('hidden'); }
+
+            if (desglose.plasticos > 0) {
+                plasticosEl.classList.remove('hidden');
+                plasticosEl.querySelector('span:last-child').textContent = `${desglose.plasticos.toFixed(2)} €`;
+            } else { plasticosEl.classList.add('hidden'); }
+        }
+
+        // --- 5.4 RENDER DE LA TABLA MATRICIAL ---
+        function renderMatrixTable() {
+            const table = document.getElementById('matrix-table');
+
+            if (currentCategory === "marcos") {
+                const molduraId = selectedProduct;
+                const molduraIndex = parseInt(molduraId.split('_')[1]) - 1;
+                document.getElementById('matrix-subtitle').textContent = `Moldura ${molduraIndex + 1} - Tarifas Completas por Acabado de Cristal`;
+
+                let html = `
+                    <thead>
+                        <tr class="bg-slate-100 border-b border-slate-200 text-slate-600">
+                            <th class="p-2.5 text-center border-r border-slate-200 font-bold bg-slate-100 sticky left-0 z-20 min-w-[80px]">Medida</th>
+                            <th class="p-2.5 text-center border-r border-slate-200 font-bold">Solo Marco</th>
+                            <th class="p-2.5 text-center border-r border-slate-200 font-bold bg-amber-50/50">C. Brillo</th>
+                            <th class="p-2.5 text-center border-r border-slate-200 font-bold bg-sky-50/50">C. Mate</th>
+                            <th class="p-2.5 text-center font-bold bg-rose-50/50">PP VS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+                MARCOS_STANDARD_DB.forEach((m, idx) => {
+                    const basePrice = m.prices[molduraIndex];
+                    html += `
+                        <tr id="marco-row-${idx}" class="border-b border-slate-100 hover:bg-rose-50/20 transition text-slate-700">
+                            <td class="p-2 font-bold text-center border-r border-slate-200 bg-slate-50 text-slate-600 sticky left-0 z-10" id="marco-header-${idx}">
+                                ${m.size}
+                            </td>
+                            <td id="marco-cell-${idx}-no" class="p-2 text-center border-r border-slate-200 font-mono">
+                                ${basePrice.toFixed(2)} €
+                            </td>
+                            <td id="marco-cell-${idx}-c_brillo" class="p-2 text-center border-r border-slate-200 font-mono bg-amber-50/20">
+                                ${(basePrice + m.brillo).toFixed(2)} €
+                            </td>
+                            <td id="marco-cell-${idx}-c_mate" class="p-2 text-center border-r border-slate-200 font-mono bg-sky-50/20">
+                                ${(basePrice + m.mate).toFixed(2)} €
+                            </td>
+                            <td id="marco-cell-${idx}-pp_vs" class="p-2 text-center font-mono bg-rose-50/20">
+                                ${(basePrice + m.ppvs).toFixed(2)} €
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += "</tbody>";
+                table.innerHTML = html;
+
+            } else {
+                const product = DB_TARIFAS[selectedProduct];
+                if (!product) return;
+
+                document.getElementById('matrix-subtitle').textContent = `Tabla PVP: ${product.nombre}`;
+
+                let html = "";
+
+                html += "<thead><tr class='bg-slate-100 border-b border-slate-200 text-slate-600'>";
+                html += "<th class='p-2 text-center border-r border-slate-200 font-bold bg-slate-100 sticky left-0 z-20 min-w-[70px]'>Alto\\Ancho</th>";
+                product.widths.forEach(w => {
+                    html += `<th class='p-2 text-center font-bold border-r border-slate-200 min-w-[55px]' id="col-header-${w}">${w} cm</th>`;
+                });
+                html += "</tr></thead>";
+
+                html += "<tbody>";
+                product.heights.forEach((h, hIdx) => {
+                    html += `<tr class='border-b border-slate-100 hover:bg-slate-50 transition' id="row-tr-${h}">`;
+                    html += `<td class='p-2 font-bold text-center border-r border-slate-200 bg-slate-50 text-slate-600 sticky left-0 z-10' id="row-header-${h}">${h} cm</td>`;
+                    
+                    product.widths.forEach((w, wIdx) => {
+                        const price = product.getPrice(wIdx, hIdx, selectedColor);
+                        html += `
+                            <td class='p-2 text-center border-r border-slate-200 text-slate-700 font-mono' id="cell-${hIdx}-${wIdx}">
+                                ${price.toFixed(2)}
+                            </td>`;
+                    });
+                    html += "</tr>";
+                });
+                html += "</tbody>";
+
+                table.innerHTML = html;
+            }
+        }
+
+        function highlightCell(colIndex, rowIndex) {
+            clearHighlights();
+
+            const cellId = `cell-${rowIndex}-${colIndex}`;
+            const cell = document.getElementById(cellId);
+            if (!cell) return;
+
+            cell.className = "p-2 text-center border-r border-emerald-300 bg-emerald-500 text-white font-extrabold shadow-inner transform scale-105 z-10 transition-all duration-150 animate-pulse font-mono";
+
+            const product = DB_TARIFAS[selectedProduct];
+            const wVal = product.widths[colIndex];
+            const hVal = product.heights[rowIndex];
+
+            const colHeader = document.getElementById(`col-header-${wVal}`);
+            const rowHeader = document.getElementById(`row-header-${hVal}`);
+            const rowTr = document.getElementById(`row-tr-${hVal}`);
+
+            if (colHeader) colHeader.className = "p-2 text-center font-black border-r border-emerald-300 bg-emerald-100 text-emerald-800 min-w-[55px]";
+            if (rowHeader) rowHeader.className = "p-2 font-black text-center border-r border-emerald-300 bg-emerald-100 text-emerald-800 sticky left-0 z-10";
+            if (rowTr) rowTr.classList.add("bg-emerald-50/20");
+
+            cell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        }
+
+        function highlightMarcoRow(idx, cristalId) {
+            clearHighlights();
+
+            const rowTr = document.getElementById(`marco-row-${idx}`);
+            const rowHeader = document.getElementById(`marco-header-${idx}`);
+            const targetCell = document.getElementById(`marco-cell-${idx}-${cristalId}`);
+
+            if (rowTr) {
+                rowTr.classList.add("bg-rose-50/80");
+            }
+            if (rowHeader) {
+                rowHeader.className = "p-2 font-black text-center border-r border-rose-300 bg-rose-100 text-rose-800 sticky left-0 z-10";
+            }
+            if (targetCell) {
+                targetCell.className = "p-2 text-center border-r border-rose-300 bg-rose-600 text-white font-extrabold shadow-inner transform scale-[1.03] z-10 transition-all duration-150 animate-pulse font-mono";
+                targetCell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            }
+        }
+
+        function clearHighlights() {
+            const table = document.getElementById('matrix-table');
+            if (!table) return;
+
+            const tds = table.querySelectorAll('td');
+            tds.forEach(td => {
+                if (td.id.startsWith('cell-')) {
+                    td.className = "p-2 text-center border-r border-slate-200 text-slate-700 font-mono";
+                } else if (td.id.startsWith('row-header-')) {
+                    td.className = "p-2 font-bold text-center border-r border-slate-200 bg-slate-50 text-slate-600 sticky left-0 z-10";
+                } else if (td.id.startsWith('marco-cell-')) {
+                    const parts = td.id.split('-');
+                    const cristalId = parts[3]; 
+                    if (cristalId === 'no') {
+                        td.className = "p-2 text-center border-r border-slate-200 font-mono";
+                    } else if (cristalId === 'c_brillo') {
+                        td.className = "p-2 text-center border-r border-slate-200 font-mono bg-amber-50/20";
+                    } else if (cristalId === 'c_mate') {
+                        td.className = "p-2 text-center border-r border-slate-200 font-mono bg-sky-50/20";
+                    } else if (cristalId === 'pp_vs') {
+                        td.className = "p-2 text-center font-mono bg-rose-50/20";
+                    }
+                } else if (td.id.startsWith('marco-header-')) {
+                    td.className = "p-2 font-bold text-center border-r border-slate-200 bg-slate-50 text-slate-600 sticky left-0 z-10";
+                }
+            });
+
+            const ths = table.querySelectorAll('th');
+            ths.forEach(th => {
+                if (th.id && th.id.startsWith('col-header-')) {
+                    th.className = "p-2 text-center font-bold border-r border-slate-200 min-w-[55px]";
+                }
+            });
+
+            const trs = table.querySelectorAll('tr');
+            trs.forEach(tr => {
+                tr.classList.remove("bg-emerald-50/20", "bg-rose-50/80");
+            });
+        }
+
+        // --- 6. GESTIÓN DEL PRESUPUESTO GLOBAL INDEPENDIENTE ---
+        function addToQuote() {
+            const anchoInput = parseFloat(document.getElementById('input-ancho').value);
+            const altoInput = parseFloat(document.getElementById('input-alto').value);
+            const tagInput = document.getElementById('input-tag').value.trim() || `${CATEGORIAS[currentCategory].nombre} ${budgets[currentCategory].length + 1}`;
+
+            if (activePrice === 0 || isNaN(anchoInput) || isNaN(altoInput)) {
+                showToast("Por favor, introduce medidas válidas antes de añadir al presupuesto.", false);
+                return;
+            }
+
+            let pName = "";
+            let cName = "";
+
+            if (currentCategory === "marcos") {
+                const molduraId = selectedProduct;
+                const molduraNum = molduraId.split('_')[1];
+                pName = `Moldura ${molduraNum}`;
+                
+                const cristalSelected = document.getElementById('select-cristal').value;
+                const cristalLabels = {
+                    no: "Solo Marco",
+                    c_brillo: "C. Brillo",
+                    c_mate: "C. Mate",
+                    pp_vs: "PP VS"
+                };
+                
+                let extras = [];
+                extras.push(cristalLabels[cristalSelected]);
+
+                if (activeConsumibles.espejoId !== "ninguno") {
+                    const esp = DB_CONSUMIBLES[activeConsumibles.espejoId];
+                    extras.push(`Espejo: ${esp.nombre}`);
+                    if (activeConsumibles.cantoPulido === "si") {
+                        extras.push("Canto Pulido");
+                    }
+                }
+                if (activeConsumibles.traseraId !== "ninguno") {
+                    const tr = DB_CONSUMIBLES[activeConsumibles.traseraId];
+                    extras.push(`Trasera: ${tr.nombre}`);
+                }
+                if (activeConsumibles.grapasGrandes > 0) extras.push(`${activeConsumibles.grapasGrandes} Grapas G.`);
+                if (activeConsumibles.grapasPequenas > 0) extras.push(`${activeConsumibles.grapasPequenas} Grapas P.`);
+                if (activeConsumibles.plasticosId !== "ninguno") {
+                    const pl = DB_CONSUMIBLES[activeConsumibles.plasticosId];
+                    extras.push(pl.nombre);
+                }
+
+                cName = extras.join(', ');
+
+            } else if (CATEGORIAS[currentCategory].tipoCalculo === "matricial") {
+                const product = DB_TARIFAS[selectedProduct];
+                pName = product.nombre;
+                const colorObj = product.colores.find(c => c.id === selectedColor);
+                cName = colorObj ? colorObj.nombre : "Estándar";
+            } else {
+                const activeModel = DB_M2[currentCategory].modelos.find(m => m.id === selectedProduct);
+                pName = activeModel.nombre;
+                cName = "Estándar";
+            }
+
+            const item = {
+                id: Date.now(),
+                categoryLabel: CATEGORIAS[currentCategory].nombre,
+                tag: tagInput,
+                productName: pName,
+                colorName: cName,
+                anchoReal: anchoInput,
+                altoReal: altoInput,
+                matchedSize: activeMatchedSize,
+                price: activePrice
+            };
+
+            budgets[currentCategory].push(item);
+            saveBudget(currentCategory);
+            renderBudget();
+            
+            document.getElementById('input-tag').value = ""; 
+            if (currentCategory === "marcos") {
+                resetConsumiblesForm();
+                calculatePrice();
+            }
+
+            showToast(`"${tagInput}" añadida al presupuesto de ${CATEGORIAS[currentCategory].nombre}.`, true);
+        }
+
+        // --- 6.1 GESTIÓN DE ACCIONES ---
+        function removeQuoteItem(id) {
+            budgets[currentCategory] = budgets[currentCategory].filter(item => item.id !== id);
+            saveBudget(currentCategory);
+            renderBudget();
+            showToast("Elemento eliminado.", true);
+        }
+
+        function clearQuote() {
+            const list = budgets[currentCategory];
+            if (!list || list.length === 0) return;
+            budgets[currentCategory] = [];
+            saveBudget(currentCategory);
+            renderBudget();
+            showToast(`Presupuesto de ${CATEGORIAS[currentCategory].nombre} vaciado.`, true);
+        }
+
+        function renderBudget() {
+            const listContainer = document.getElementById('quote-list');
+            const totalDisplay = document.getElementById('display-total-quote');
+            
+            const currentList = budgets[currentCategory] || [];
+
+            if (currentList.length === 0) {
+                listContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-6">No hay elementos añadidos al presupuesto de ${CATEGORIAS[currentCategory].nombre || ''}.</p>`;
+                totalDisplay.textContent = "0,00";
+                return;
+            }
+
+            let html = "";
+            let total = 0;
+
+            currentList.forEach(item => {
+                total += item.price;
+                html += `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs hover:border-slate-300 transition gap-2 animate-fade-in">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-slate-200 text-slate-700 mr-1.5 align-middle">${item.categoryLabel}</span>
+                                    <span class="font-bold text-slate-900 align-middle truncate">${item.tag}</span>
+                                </div>
+                                <span class="font-extrabold text-emerald-700 font-mono text-sm">${item.price.toFixed(2)} €</span>
+                            </div>
+                            <div class="text-slate-500 text-[11px] mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
+                                <span><strong>Modelo:</strong> ${item.productName}</span>
+                                <span>•</span>
+                                <span class="text-rose-600"><strong>Selección/Extras:</strong> ${item.colorName}</span>
+                                <span>•</span>
+                                <span><strong>Medidas:</strong> ${item.anchoReal}x${item.altoReal}cm</span>
+                            </div>
+                        </div>
+                        <button onclick="removeQuoteItem(${item.id})" class="text-slate-400 hover:text-red-500 transition p-1 rounded-lg shrink-0 cursor-pointer">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = html;
+            totalDisplay.textContent = total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            safeCreateIcons();
+        }
+
+        // --- 6.2 LOCAL STORAGE ---
+        function saveBudget(catId) {
+            safeStorage.setItem(`acudam_budget_${catId}`, JSON.stringify(budgets[catId]));
+        }
+
+        function loadAllBudgets() {
+            const categoriasKeys = ['mosquiteras', 'cortinas', 'persianas', 'estores', 'marcos', 'alfombras'];
+            categoriasKeys.forEach(catId => {
+                const saved = safeStorage.getItem(`acudam_budget_${catId}`);
+                if (saved) {
+                    try {
+                        budgets[catId] = JSON.parse(saved);
+                    } catch(e) {
+                        budgets[catId] = [];
+                    }
+                }
+            });
+        }
+
+        // --- 7. IMPRESIÓN ---
+        function printQuote() {
+            const currentList = budgets[currentCategory] || [];
+
+            if (currentList.length === 0) {
+                showToast(`Por favor, añade al menos un elemento al presupuesto de ${CATEGORIAS[currentCategory].nombre} para imprimir.`, false);
+                return;
+            }
+
+            const printRows = document.getElementById('print-table-rows');
+            let html = "";
+            let totalNeto = 0;
+
+            currentList.forEach(item => {
+                totalNeto += item.price;
+                html += `
+                    <tr class="border-b border-slate-200">
+                        <td class="p-2 font-semibold">${item.tag}</td>
+                        <td class="p-2 uppercase font-black text-slate-500 text-[10px]">${item.categoryLabel}</td>
+                        <td class="p-2">${item.productName}</td>
+                        <td class="p-2 text-rose-700 font-medium">${item.colorName}</td>
+                        <td class="p-2 text-center">${item.anchoReal} x ${item.altoReal} cm</td>
+                        <td class="p-2 text-center font-mono text-slate-600">${item.matchedSize}</td>
+                        <td class="p-2 text-right font-bold font-mono">${item.price.toFixed(2)} €</td>
+                    </tr>
+                `;
+            });
+
+            printRows.innerHTML = html;
+            document.getElementById('print-header-title').textContent = `PRESUPUESTO DE ${CATEGORIAS[currentCategory].nombre.toUpperCase()}`;
+            document.getElementById('print-total').textContent = `${totalNeto.toFixed(2)} €`;
+
+            window.print();
+        }
+
+        // --- 8. TOASTS ---
+        function showToast(message, isSuccess) {
+            const oldToast = document.getElementById('custom-toast');
+            if (oldToast) oldToast.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'custom-toast';
+            toast.className = `fixed bottom-6 right-6 z-50 p-4 rounded-xl shadow-lg border text-xs max-w-sm flex items-center gap-2.5 transition-all duration-300 transform translate-y-2 opacity-0
+                ${isSuccess ? 'bg-emerald-50 text-emerald-950 border-emerald-200' : 'bg-rose-50 text-rose-950 border-rose-200'}`;
+            
+            const iconName = isSuccess ? 'check-circle' : 'alert-octagon';
+            toast.innerHTML = `
+                <i data-lucide="${iconName}" class="${isSuccess ? 'text-emerald-600' : 'text-rose-600'} w-4 h-4 shrink-0"></i>
+                <div class="flex-1 font-medium">${message}</div>
+            `;
+
+            document.body.appendChild(toast);
+            safeCreateIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.add('translate-y-2', 'opacity-0');
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
